@@ -4,58 +4,63 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-20 13:42:59
+ * @LastEditTime: 2020-05-20 14:01:07
  -->
 <!--  -->
 <template>
   <mycontent title="数字旭辉" :isback="searchWodr" @back="searchWodr='';isRecord = false">
-    <view v-if="searchWodr">
-      <textarea
-        v-model="searchWodr"
-        :focus="isfocus"
-        confirm-type="send"
-        class="myInput"
-        auto-height
-        @confirm="getData"
-      />
-      <view
-        class="hint_Text row_center"
-        style="margin-top:8upx;font-size:40upx;justify-content: flex-start;"
-        @click="isfocus=true"
-        v-if="!isRecord"
-      >
-        轻点以编辑
-        <image
-          src="../../static/images/riw_arr.png"
-          style="height:22upx;width:12upx;margin-left:14upx;"
+    <scroll-view scroll-y :style="{'height':height}">
+      <view v-if="searchWodr">
+        <textarea
+          v-model="searchWodr"
+          :focus="isfocus"
+          confirm-type="send"
+          class="myInput"
+          auto-height
+          @confirm="getData"
+        />
+        <view
+          class="hint_Text row_center"
+          style="margin-top:8upx;font-size:40upx;justify-content: flex-start;"
+          @click="isfocus=true"
+          v-if="!isRecord"
+        >
+          轻点以编辑
+          <image
+            src="../../static/images/riw_arr.png"
+            style="height:22upx;width:12upx;margin-left:14upx;"
+          />
+        </view>
+        <view
+          class="noraml_Text"
+          style="font-size:40upx;margin-top:40upx"
+          v-if="!isRecord"
+        >为你找到如下结果：</view>
+        <myBlock
+          v-for="item in items"
+          :key="item.id"
+          :title="item.appName"
+          :content="item.appDescription"
+          :url="item.appUrl"
+          :viewAppId="item.id"
         />
       </view>
-      <view class="noraml_Text" style="font-size:40upx;margin-top:40upx"  v-if="!isRecord">为你找到如下结果：</view>
-      <myBlock
-        v-for="item in items"
-        :key="item.id"
-        :title="item.appName"
-        :content="item.appDescription"
-        :url="item.appUrl"
-        :viewAppId="item.id"
-      />
-    </view>
-    <view class="noraml_Text" v-else-if="isRecord">
-      正在听
-      <br />请继续…
-    </view>
-    <view v-else>
-      <view class="hint_Text mT20" v-if="employeeInfo">你好，{{employeeInfo.name}}</view>
-      <view class="big_Text" style="margin-top:4upx;margin-bottom:50upx">你可以这样问：</view>
-      <view
-        class="noraml_Text"
-        style="margin-top:37upx"
-        v-for="item in queryCommonTips"
-        :key="item.id"
-        @click="toSearch(item.tipContent)"
-      >“{{item.tipContent}}”</view>
-    </view>
-
+      <view class="noraml_Text" v-else-if="isRecord">
+        正在听
+        <br />请继续…
+      </view>
+      <view v-else>
+        <view class="hint_Text mT20" v-if="employeeInfo">你好，{{employeeInfo.name}}</view>
+        <view class="big_Text" style="margin-top:4upx;margin-bottom:50upx">你可以这样问：</view>
+        <view
+          class="noraml_Text"
+          style="margin-top:37upx"
+          v-for="item in queryCommonTips"
+          :key="item.id"
+          @click="toSearch(item.tipContent)"
+        >“{{item.tipContent}}”</view>
+      </view>
+    </scroll-view>
     <view class="bottom_view">
       <div class="gradient-text" v-if="!isRecord&&!searchWodr">轻按再松开,说出你想搜索的内容</div>
       <view class="row_center video_view">
@@ -86,6 +91,7 @@ export default class Index extends Vue {
   isfocus = false; //是否有焦点
   isAnimotion = false;
   isConnectSuccess = false; //是否成功
+  height = `calc(100vh - ${getApp().globalData!.CustomBar + 320}rpx)`;
   searchWodr = ""; //搜索内容
   options = {
     duration: 1000 * 60,

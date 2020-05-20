@@ -266,6 +266,7 @@ var Index = /*#__PURE__*/function (_Vue) {
     _this.isAnimotion = false;
     _this.isConnectSuccess = false; //是否成功
 
+    _this.height = "calc(100vh - ".concat(getApp().globalData.CustomBar + 320, "rpx)");
     _this.searchWodr = ""; //搜索内容
 
     _this.options = {
