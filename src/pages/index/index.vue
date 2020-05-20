@@ -4,11 +4,11 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-20 14:01:07
+ * @LastEditTime: 2020-05-20 18:54:57
  -->
 <!--  -->
 <template>
-  <mycontent title="数字旭辉" :isback="searchWodr" @back="searchWodr='';isRecord = false">
+  <mycontent title="数字旭辉" :isback="searchWodr" @back="isfocus=false;searchWodr='';isRecord = false">
     <scroll-view scroll-y :style="{'height':height}">
       <view v-if="searchWodr">
         <textarea
@@ -99,7 +99,7 @@ export default class Index extends Vue {
     numberOfChannels: 1,
     encodeBitRate: 48000,
     format: "mp3",
-    frameSize: 6
+    frameSize: 1.5
   };
   queryCommonTips: any[] = [];
   xfInfo: any = {};
@@ -165,6 +165,7 @@ export default class Index extends Vue {
         }
       }
       params.data.status = status;
+      console.log("发送参数:", params);
       uni.sendSocketMessage({
         data: JSON.stringify(params),
         success: data => {
@@ -191,14 +192,21 @@ export default class Index extends Vue {
         searchParam: this.searchWodr
       });
       if (res.success) {
-        this.items = res.rows;
-        if (this.items.length === 1) {
-          getApp().globalData!.url = this.items[0].appUrl;
-          getApp().globalData!.title = this.items[0].appName;
-          getApp().globalData!.viewAppId = this.items[0].id;
+        if (res.rows.length === 1) {
+          getApp().globalData!.url = res.rows[0].appUrl;
+          getApp().globalData!.title = res.rows[0].appName;
+          getApp().globalData!.viewAppId = res.rows[0].id;
           uni.navigateTo({
-            url: "/pages/webview/webview"
+            url: "/pages/webview/webview",
+            success: () => {
+              let naTo = setInterval(() => {
+                clearInterval(naTo);
+                this.items = res.rows;
+              }, 500);
+            }
           });
+        } else {
+          this.items = res.rows;
         }
       }
     }

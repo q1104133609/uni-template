@@ -135,6 +135,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   if (!_vm._isMounted) {
     _vm.e0 = function($event) {
+      _vm.isfocus = false
       _vm.searchWodr = ""
       _vm.isRecord = false
     }
@@ -275,7 +276,7 @@ var Index = /*#__PURE__*/function (_Vue) {
       numberOfChannels: 1,
       encodeBitRate: 48000,
       format: "mp3",
-      frameSize: 6
+      frameSize: 1.5
     };
     _this.queryCommonTips = [];
     _this.xfInfo = {};
@@ -368,6 +369,7 @@ var Index = /*#__PURE__*/function (_Vue) {
                   }
 
                   params.data.status = status;
+                  console.log("发送参数:", params);
                   uni.sendSocketMessage({
                     data: JSON.stringify(params),
                     success: function success(data) {
@@ -407,6 +409,8 @@ var Index = /*#__PURE__*/function (_Vue) {
     key: "getData",
     value: function () {
       var _getData = _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee2() {
+        var _this3 = this;
+
         var res;
         return _regenerator.default.wrap(function _callee2$(_context2) {
           while (1) {
@@ -426,15 +430,21 @@ var Index = /*#__PURE__*/function (_Vue) {
                 res = _context2.sent;
 
                 if (res.success) {
-                  this.items = res.rows;
-
-                  if (this.items.length === 1) {
-                    getApp().globalData.url = this.items[0].appUrl;
-                    getApp().globalData.title = this.items[0].appName;
-                    getApp().globalData.viewAppId = this.items[0].id;
+                  if (res.rows.length === 1) {
+                    getApp().globalData.url = res.rows[0].appUrl;
+                    getApp().globalData.title = res.rows[0].appName;
+                    getApp().globalData.viewAppId = res.rows[0].id;
                     uni.navigateTo({
-                      url: "/pages/webview/webview"
+                      url: "/pages/webview/webview",
+                      success: function success() {
+                        var naTo = setInterval(function () {
+                          clearInterval(naTo);
+                          _this3.items = res.rows;
+                        }, 500);
+                      }
                     });
+                  } else {
+                    this.items = res.rows;
                   }
                 }
 
@@ -456,11 +466,11 @@ var Index = /*#__PURE__*/function (_Vue) {
   }, {
     key: "mounted",
     value: function mounted() {
-      var _this3 = this;
+      var _this4 = this;
 
       uni.onSocketOpen(function (data) {
         console.log("服务连接成功");
-        _this3.isConnectSuccess = true;
+        _this4.isConnectSuccess = true;
       });
       uni.onSocketError(function (err) {
         console.log("服务连接失败，请重试");
@@ -478,11 +488,11 @@ var Index = /*#__PURE__*/function (_Vue) {
               word += w;
             });
           });
-          _this3.searchWodr += word;
+          _this4.searchWodr += word;
         }
 
-        if (_this3.isLastFrame) {
-          _this3.onRecordOver();
+        if (_this4.isLastFrame) {
+          _this4.onRecordOver();
         }
       });
     } //录音结束
@@ -500,7 +510,7 @@ var Index = /*#__PURE__*/function (_Vue) {
     key: "startRecord",
     value: function () {
       var _startRecord = _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee3() {
-        var _this4 = this;
+        var _this5 = this;
 
         return _regenerator.default.wrap(function _callee3$(_context3) {
           while (1) {
@@ -516,16 +526,16 @@ var Index = /*#__PURE__*/function (_Vue) {
               case 2:
                 this.isAnimotion = true;
                 this.timer = setInterval(function () {
-                  _this4.intervalTime += 0.5;
+                  _this5.intervalTime += 0.5;
 
-                  if (_this4.intervalTime >= 0.5 && !_this4.isRecord) {
+                  if (_this5.intervalTime >= 0.5 && !_this5.isRecord) {
                     uni.connectSocket({
-                      url: _this4.getAuthStr()
+                      url: _this5.getAuthStr()
                     });
-                    _this4.isRecord = true;
-                    _this4.intervalTime = 0;
+                    _this5.isRecord = true;
+                    _this5.intervalTime = 0;
 
-                    _this4.recorderManager.start(_this4.options);
+                    _this5.recorderManager.start(_this5.options);
                   }
                 }, 300);
 
@@ -547,7 +557,7 @@ var Index = /*#__PURE__*/function (_Vue) {
   }, {
     key: "endRecord",
     value: function endRecord() {
-      var _this5 = this;
+      var _this6 = this;
 
       clearInterval(this.timer);
 
@@ -558,7 +568,7 @@ var Index = /*#__PURE__*/function (_Vue) {
 
       if (this.isRecord) {
         setTimeout(function () {
-          _this5.recorderManager.stop();
+          _this6.recorderManager.stop();
         }, 300); //延迟小段时间停止录音, 更好的体验
       }
     } // 鉴权签名
