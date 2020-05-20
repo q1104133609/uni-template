@@ -4,11 +4,11 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-20 13:00:35
+ * @LastEditTime: 2020-05-20 13:42:59
  -->
 <!--  -->
 <template>
-  <mycontent title="数字旭辉" :isback="searchWodr" @back="searchWodr=''">
+  <mycontent title="数字旭辉" :isback="searchWodr" @back="searchWodr='';isRecord = false">
     <view v-if="searchWodr">
       <textarea
         v-model="searchWodr"
@@ -22,6 +22,7 @@
         class="hint_Text row_center"
         style="margin-top:8upx;font-size:40upx;justify-content: flex-start;"
         @click="isfocus=true"
+        v-if="!isRecord"
       >
         轻点以编辑
         <image
@@ -29,7 +30,7 @@
           style="height:22upx;width:12upx;margin-left:14upx;"
         />
       </view>
-      <view class="noraml_Text" style="font-size:40upx;margin-top:40upx">为你找到如下结果：</view>
+      <view class="noraml_Text" style="font-size:40upx;margin-top:40upx"  v-if="!isRecord">为你找到如下结果：</view>
       <myBlock
         v-for="item in items"
         :key="item.id"
@@ -84,6 +85,7 @@ export default class Index extends Vue {
   firstSend = true; //是否第一次
   isfocus = false; //是否有焦点
   isAnimotion = false;
+  isConnectSuccess = false; //是否成功
   searchWodr = ""; //搜索内容
   options = {
     duration: 1000 * 60,
@@ -113,13 +115,19 @@ export default class Index extends Vue {
     }
     //录音开始
     this.recorderManager.onStart(() => {
+      this.isConnectSuccess = false;
       this.isLastFrame = false;
       this.searchWodr = "";
       this.isfocus = false;
       this.items = [];
     });
     //录音结束
-    this.recorderManager.onStop(res => {});
+    this.recorderManager.onStop(res => {
+      if (!this.isConnectSuccess) {
+        this.isAnimotion = false;
+        this.isRecord = false;
+      }
+    });
     //录音回调
     this.recorderManager.onFrameRecorded((res: any) => {
       const { frameBuffer, isLastFrame } = res;
@@ -194,6 +202,7 @@ export default class Index extends Vue {
   mounted() {
     uni.onSocketOpen(data => {
       console.log("服务连接成功");
+      this.isConnectSuccess = true;
     });
     uni.onSocketError(err => {
       console.log("服务连接失败，请重试");
@@ -226,7 +235,7 @@ export default class Index extends Vue {
   }
   //开始录音
   async startRecord() {
-    if (this.isRecord) {
+    if (this.isRecord || this.isAnimotion) {
       return;
     }
     this.isAnimotion = true;
@@ -242,10 +251,12 @@ export default class Index extends Vue {
   }
   //结束录音
   endRecord() {
-    if (this.intervalTime <= 0.5) {
-      console.log("录音太短了!!!");
-    }
     clearInterval(this.timer);
+    if (this.intervalTime <= 0.5) {
+      this.isAnimotion = false;
+      console.log("endRecord");
+    }
+
     if (this.isRecord) {
       setTimeout(() => {
         this.recorderManager.stop();

@@ -4,11 +4,11 @@
  * @Author: 小白
  * @Date: 2020-05-13 18:04:23
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-20 12:53:28
+ * @LastEditTime: 2020-05-20 13:10:04
  -->
 <!--  -->
 <template>
-  <view class="recode" @touchstart="touchstart" @touchend="$emit('endRecord')">
+  <view class="recode" @longtap="touchstart" @touchend="$emit('endRecord')">
     <view class="ripple" :animation="spreakingAnimation1" v-if="isRecord"></view>
     <view class="ripple" :animation="spreakingAnimation2" v-if="isRecord">></view>
     <view class="ripple" :animation="spreakingAnimation3" v-if="isRecord">></view>

@@ -136,6 +136,7 @@ var render = function() {
   if (!_vm._isMounted) {
     _vm.e0 = function($event) {
       _vm.searchWodr = ""
+      _vm.isRecord = false
     }
 
     _vm.e1 = function($event) {
@@ -263,6 +264,8 @@ var Index = /*#__PURE__*/function (_Vue) {
     _this.isfocus = false; //是否有焦点
 
     _this.isAnimotion = false;
+    _this.isConnectSuccess = false; //是否成功
+
     _this.searchWodr = ""; //搜索内容
 
     _this.options = {
@@ -315,13 +318,19 @@ var Index = /*#__PURE__*/function (_Vue) {
               case 8:
                 //录音开始
                 this.recorderManager.onStart(function () {
+                  _this2.isConnectSuccess = false;
                   _this2.isLastFrame = false;
                   _this2.searchWodr = "";
                   _this2.isfocus = false;
                   _this2.items = [];
                 }); //录音结束
 
-                this.recorderManager.onStop(function (res) {}); //录音回调
+                this.recorderManager.onStop(function (res) {
+                  if (!_this2.isConnectSuccess) {
+                    _this2.isAnimotion = false;
+                    _this2.isRecord = false;
+                  }
+                }); //录音回调
 
                 this.recorderManager.onFrameRecorded(function (res) {
                   var frameBuffer = res.frameBuffer,
@@ -450,6 +459,7 @@ var Index = /*#__PURE__*/function (_Vue) {
 
       uni.onSocketOpen(function (data) {
         console.log("服务连接成功");
+        _this3.isConnectSuccess = true;
       });
       uni.onSocketError(function (err) {
         console.log("服务连接失败，请重试");
@@ -495,7 +505,7 @@ var Index = /*#__PURE__*/function (_Vue) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                if (!this.isRecord) {
+                if (!(this.isRecord || this.isAnimotion)) {
                   _context3.next = 2;
                   break;
                 }
@@ -538,11 +548,12 @@ var Index = /*#__PURE__*/function (_Vue) {
     value: function endRecord() {
       var _this5 = this;
 
-      if (this.intervalTime <= 0.5) {
-        console.log("录音太短了!!!");
-      }
-
       clearInterval(this.timer);
+
+      if (this.intervalTime <= 0.5) {
+        this.isAnimotion = false;
+        console.log("endRecord");
+      }
 
       if (this.isRecord) {
         setTimeout(function () {
