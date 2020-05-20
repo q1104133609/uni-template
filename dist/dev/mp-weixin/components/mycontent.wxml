@@ -1,0 +1,1 @@
+<view style="width:100vw;"><cu-custom vue-id="36d92124-1" isback="{{isback}}" data-event-opts="{{[['^back',[['$emit',['back']]]]]}}" bind:back="__e" bind:__l="__l" vue-slots="{{['content']}}"><view slot="content">{{title}}</view></cu-custom><view style="{{'width:100vw;padding-left:48rpx;padding-right:48rpx;'+('padding-top:'+(cuCustom+'px')+';')}}"><slot></slot></view></view>

@@ -1,0 +1,1 @@
+<view data-event-opts="{{[['tap',[['toWebView',['$event']]]]]}}" class="blcokc row_between _div data-v-a956fba6" bindtap="__e"><view class="_div data-v-a956fba6"><view class="_div data-v-a956fba6">{{title}}</view><view class="desc _div data-v-a956fba6">{{content}}</view></view><image src="../static/images/black_arrow.png" class="data-v-a956fba6"></image></view>

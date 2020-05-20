@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "mycontent": "/components/mycontent",
+    "my-block": "/components/block"
+  }
+}
