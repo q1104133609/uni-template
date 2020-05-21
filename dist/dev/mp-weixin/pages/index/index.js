@@ -265,18 +265,16 @@ var Index = /*#__PURE__*/function (_Vue) {
     _this.isfocus = false; //是否有焦点
 
     _this.isAnimotion = false;
-    _this.isConnectSuccess = false; //是否成功
-
     _this.height = "calc(100vh - ".concat(getApp().globalData.CustomBar + 320, "rpx)");
     _this.searchWodr = ""; //搜索内容
 
     _this.options = {
       duration: 1000 * 60,
       sampleRate: 16000,
-      numberOfChannels: 1,
+      numberOfChannels: 2,
       encodeBitRate: 48000,
       format: "mp3",
-      frameSize: 1.5
+      frameSize: 3
     };
     _this.queryCommonTips = [];
     _this.xfInfo = {};
@@ -285,6 +283,8 @@ var Index = /*#__PURE__*/function (_Vue) {
     _this.intervalTime = 0;
     _this.timer = null;
     _this.isRecord = false;
+    _this.isUp = true;
+    _this.iatResult = [];
     return _this;
   }
 
@@ -318,79 +318,6 @@ var Index = /*#__PURE__*/function (_Vue) {
                 getApp().globalData.userName = res.employeeInfo.userName;
 
               case 8:
-                //录音开始
-                this.recorderManager.onStart(function () {
-                  _this2.isConnectSuccess = false;
-                  _this2.isLastFrame = false;
-                  _this2.searchWodr = "";
-                  _this2.isfocus = false;
-                  _this2.items = [];
-                }); //录音结束
-
-                this.recorderManager.onStop(function (res) {
-                  if (!_this2.isConnectSuccess) {
-                    _this2.isAnimotion = false;
-                    _this2.isRecord = false;
-                  }
-                }); //录音回调
-
-                this.recorderManager.onFrameRecorded(function (res) {
-                  var frameBuffer = res.frameBuffer,
-                      isLastFrame = res.isLastFrame;
-                  var params = {
-                    common: {
-                      app_id: _this2.xfInfo.appId
-                    },
-                    business: {
-                      language: "zh_cn",
-                      domain: "iat",
-                      accent: "mandarin",
-                      vad_eos: 1000,
-                      dwa: "wpgs"
-                    },
-                    data: {
-                      status: 0,
-                      format: "audio/L16;rate=16000",
-                      encoding: "lame",
-                      audio: uni.arrayBufferToBase64(frameBuffer)
-                    }
-                  }; // 拼接数据
-
-                  var status = 0;
-
-                  if (_this2.firstSend) {
-                    _this2.firstSend = false;
-                  } else {
-                    if (isLastFrame) {
-                      status = 2;
-                    } else {
-                      status = 1;
-                    }
-                  }
-
-                  params.data.status = status;
-                  console.log("发送参数:", params);
-                  uni.sendSocketMessage({
-                    data: JSON.stringify(params),
-                    success: function success(data) {
-                      console.log("send success:" + JSON.stringify(data));
-                    },
-                    fail: function fail(err) {
-                      _this2.isLastFrame = true;
-
-                      _this2.onRecordOver();
-
-                      console.log("send error:" + JSON.stringify(err));
-                    },
-                    complete: function complete() {
-                      if (isLastFrame) {
-                        _this2.isLastFrame = true;
-                      }
-                    }
-                  });
-                });
-
-              case 11:
               case "end":
                 return _context.stop();
             }
@@ -416,17 +343,19 @@ var Index = /*#__PURE__*/function (_Vue) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
+                uni.hideLoading();
+
                 if (!this.searchWodr) {
-                  _context2.next = 5;
+                  _context2.next = 6;
                   break;
                 }
 
-                _context2.next = 3;
+                _context2.next = 4;
                 return (0, _request.get)("/api/wechat/app/search/index/query", {
                   searchParam: this.searchWodr
                 });
 
-              case 3:
+              case 4:
                 res = _context2.sent;
 
                 if (res.success) {
@@ -448,7 +377,7 @@ var Index = /*#__PURE__*/function (_Vue) {
                   }
                 }
 
-              case 5:
+              case 6:
               case "end":
                 return _context2.stop();
             }
@@ -468,27 +397,121 @@ var Index = /*#__PURE__*/function (_Vue) {
     value: function mounted() {
       var _this4 = this;
 
+      //录音开始
+      this.recorderManager.onStart(function () {
+        _this4.isRecord = true;
+        _this4.intervalTime = 0;
+        _this4.isLastFrame = false;
+        _this4.searchWodr = "";
+        _this4.isfocus = false;
+        _this4.items = [];
+      }); //录音结束
+
+      this.recorderManager.onStop(function (res) {
+        _this4.isAnimotion = false;
+      }); //录音回调
+
+      this.recorderManager.onFrameRecorded(function (res) {
+        var frameBuffer = res.frameBuffer,
+            isLastFrame = res.isLastFrame;
+        var params = {
+          common: {
+            app_id: _this4.xfInfo.appId
+          },
+          business: {
+            language: "zh_cn",
+            domain: "iat",
+            accent: "mandarin",
+            vad_eos: 1000,
+            dwa: "wpgs"
+          },
+          data: {
+            status: 0,
+            format: "audio/L16;rate=16000",
+            encoding: "lame",
+            audio: uni.arrayBufferToBase64(frameBuffer)
+          }
+        }; // 拼接数据
+
+        var status = 0;
+
+        if (_this4.firstSend) {
+          _this4.firstSend = false;
+        } else {
+          if (isLastFrame) {
+            status = 2;
+          } else {
+            status = 1;
+          }
+        }
+
+        params.data.status = status;
+        console.log("发送参数:", status);
+        uni.sendSocketMessage({
+          data: JSON.stringify(params),
+          success: function success(data) {
+            console.log("send success:" + JSON.stringify(data));
+          },
+          fail: function fail(err) {
+            _this4.isLastFrame = true;
+
+            _this4.recorderManager.stop();
+
+            _this4.onRecordOver();
+
+            console.log("send error:" + JSON.stringify(err));
+          },
+          complete: function complete() {
+            if (isLastFrame) {
+              _this4.isLastFrame = true;
+            }
+          }
+        });
+      });
       uni.onSocketOpen(function (data) {
+        _this4.iatResult = [];
         console.log("服务连接成功");
-        _this4.isConnectSuccess = true;
+
+        _this4.recorderManager.start(_this4.options);
       });
       uni.onSocketError(function (err) {
-        console.log("服务连接失败，请重试");
+        console.log("socket服务连接失败，请重试");
+      });
+      uni.onSocketClose(function (data) {
+        if (_this4.isRecord) {
+          _this4.recorderManager.stop();
+
+          _this4.isAnimotion = false;
+          _this4.isRecord = false;
+
+          _this4.getData();
+        }
       });
       uni.onSocketMessage(function (res) {
         console.log("收到服务器返回消息", res);
         var reponse = JSON.parse(res.data);
 
         if (reponse.code === 0) {
-          var word = "";
-          reponse.data.result.ws.forEach(function (_ref) {
-            var cw = _ref.cw;
-            cw.forEach(function (_ref2) {
-              var w = _ref2.w;
-              word += w;
+          var str = "";
+          _this4.iatResult[reponse.data.result.sn] = reponse.data.result;
+
+          if (reponse.data.result.pgs == "rpl") {
+            reponse.data.result.rg.forEach(function (i) {
+              _this4.iatResult[i] = null;
             });
+          }
+
+          _this4.iatResult.forEach(function (i) {
+            if (i != null) {
+              i.ws.forEach(function (j) {
+                j.cw.forEach(function (k) {
+                  str += k.w;
+                });
+              });
+            }
           });
-          _this4.searchWodr += word;
+
+          _this4.searchWodr = str;
         }
 
         if (_this4.isLastFrame) {
@@ -500,10 +523,12 @@ var Index = /*#__PURE__*/function (_Vue) {
   }, {
     key: "onRecordOver",
     value: function onRecordOver() {
-      this.isRecord = false;
-      this.isAnimotion = false;
-      uni.closeSocket();
-      this.getData();
+      if (this.isRecord) {
+        uni.closeSocket();
+        this.isAnimotion = false;
+        this.isRecord = false;
+        this.getData();
+      }
     } //开始录音
 
   }, {
@@ -516,14 +541,16 @@ var Index = /*#__PURE__*/function (_Vue) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                if (!(this.isRecord || this.isAnimotion)) {
-                  _context3.next = 2;
+                console.log("startRecord", this.isRecord, this.isAnimotion, !this.isUp);
+
+                if (!(this.isRecord || this.isAnimotion || !this.isUp)) {
+                  _context3.next = 3;
                   break;
                 }
 
                 return _context3.abrupt("return");
 
-              case 2:
+              case 3:
                 this.isAnimotion = true;
                 this.timer = setInterval(function () {
                   _this5.intervalTime += 0.5;
@@ -532,14 +559,10 @@ var Index = /*#__PURE__*/function (_Vue) {
                     uni.connectSocket({
                       url: _this5.getAuthStr()
                     });
-                    _this5.isRecord = true;
-                    _this5.intervalTime = 0;
-
-                    _this5.recorderManager.start(_this5.options);
                   }
                 }, 300);
 
-              case 4:
+              case 5:
               case "end":
                 return _context3.stop();
             }
@@ -560,15 +583,21 @@ var Index = /*#__PURE__*/function (_Vue) {
       var _this6 = this;
 
       clearInterval(this.timer);
+      this.isAnimotion = false;
 
       if (this.intervalTime <= 0.5) {
-        this.isAnimotion = false;
-        console.log("endRecord");
+        this.isUp = true;
       }
 
       if (this.isRecord) {
+        uni.showLoading({
+          title: "正在解析",
+          mask: true
+        });
         setTimeout(function () {
           _this6.recorderManager.stop();
+
+          _this6.isUp = true;
         }, 300); //延迟小段时间停止录音, 更好的体验
       }
     } // 鉴权签名

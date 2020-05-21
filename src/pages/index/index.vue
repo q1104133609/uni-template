@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-20 18:54:57
+ * @LastEditTime: 2020-05-21 19:57:51
  -->
 <!--  -->
 <template>
@@ -14,6 +14,7 @@
         <textarea
           v-model="searchWodr"
           :focus="isfocus"
+          :display="isRecord"
           confirm-type="send"
           class="myInput"
           auto-height
@@ -45,10 +46,12 @@
           :viewAppId="item.id"
         />
       </view>
+
       <view class="noraml_Text" v-else-if="isRecord">
         正在听
         <br />请继续…
       </view>
+      <view class="noraml_Text" v-else-if="isAnimotion">准备中...</view>
       <view v-else>
         <view class="hint_Text mT20" v-if="employeeInfo">你好，{{employeeInfo.name}}</view>
         <view class="big_Text" style="margin-top:4upx;margin-bottom:50upx">你可以这样问：</view>
@@ -90,16 +93,15 @@ export default class Index extends Vue {
   firstSend = true; //是否第一次
   isfocus = false; //是否有焦点
   isAnimotion = false;
-  isConnectSuccess = false; //是否成功
   height = `calc(100vh - ${getApp().globalData!.CustomBar + 320}rpx)`;
   searchWodr = ""; //搜索内容
   options = {
     duration: 1000 * 60,
     sampleRate: 16000,
-    numberOfChannels: 1,
+    numberOfChannels: 2,
     encodeBitRate: 48000,
     format: "mp3",
-    frameSize: 1.5
+    frameSize: 3
   };
   queryCommonTips: any[] = [];
   xfInfo: any = {};
@@ -108,6 +110,8 @@ export default class Index extends Vue {
   intervalTime = 0;
   timer: any = null;
   isRecord = false;
+  isUp = true;
+  iatResult: any[] = [];
 
   async created() {
     get("/api/public/wechat/tip/content/config/queryCommonTips").then(v => {
@@ -119,9 +123,42 @@ export default class Index extends Vue {
       this.xfInfo = res.xfyunAuthConfig;
       getApp().globalData!!.userName = res.employeeInfo.userName;
     }
+  }
+
+  //搜索数据
+  async getData() {
+    uni.hideLoading();
+    if (this.searchWodr) {
+      const res = await get("/api/wechat/app/search/index/query", {
+        searchParam: this.searchWodr
+      });
+      if (res.success) {
+        if (res.rows.length === 1) {
+          getApp().globalData!.url = res.rows[0].appUrl;
+          getApp().globalData!.title = res.rows[0].appName;
+          getApp().globalData!.viewAppId = res.rows[0].id;
+          uni.navigateTo({
+            url: "/pages/webview/webview",
+            success: () => {
+              let naTo = setInterval(() => {
+                clearInterval(naTo);
+                this.items = res.rows;
+              }, 500);
+            }
+          });
+        } else {
+          this.items = res.rows;
+        }
+      }
+    }
+  }
+
+  //监听socket
+  mounted() {
     //录音开始
     this.recorderManager.onStart(() => {
-      this.isConnectSuccess = false;
+      this.isRecord = true;
+      this.intervalTime = 0;
       this.isLastFrame = false;
       this.searchWodr = "";
       this.isfocus = false;
@@ -129,10 +166,7 @@ export default class Index extends Vue {
     });
     //录音结束
     this.recorderManager.onStop(res => {
-      if (!this.isConnectSuccess) {
-        this.isAnimotion = false;
-        this.isRecord = false;
-      }
+      this.isAnimotion = false;
     });
     //录音回调
     this.recorderManager.onFrameRecorded((res: any) => {
@@ -165,7 +199,9 @@ export default class Index extends Vue {
         }
       }
       params.data.status = status;
-      console.log("发送参数:", params);
+
+      console.log("发送参数:", status);
+
       uni.sendSocketMessage({
         data: JSON.stringify(params),
         success: data => {
@@ -173,6 +209,7 @@ export default class Index extends Vue {
         },
         fail: err => {
           this.isLastFrame = true;
+          this.recorderManager.stop();
           this.onRecordOver();
           console.log("send error:" + JSON.stringify(err));
         },
@@ -183,56 +220,43 @@ export default class Index extends Vue {
         }
       });
     });
-  }
-
-  //搜索数据
-  async getData() {
-    if (this.searchWodr) {
-      const res = await get("/api/wechat/app/search/index/query", {
-        searchParam: this.searchWodr
-      });
-      if (res.success) {
-        if (res.rows.length === 1) {
-          getApp().globalData!.url = res.rows[0].appUrl;
-          getApp().globalData!.title = res.rows[0].appName;
-          getApp().globalData!.viewAppId = res.rows[0].id;
-          uni.navigateTo({
-            url: "/pages/webview/webview",
-            success: () => {
-              let naTo = setInterval(() => {
-                clearInterval(naTo);
-                this.items = res.rows;
-              }, 500);
-            }
-          });
-        } else {
-          this.items = res.rows;
-        }
-      }
-    }
-  }
-
-  //监听socket
-  mounted() {
     uni.onSocketOpen(data => {
+      this.iatResult = [];
       console.log("服务连接成功");
-      this.isConnectSuccess = true;
+      this.recorderManager.start(this.options);
     });
     uni.onSocketError(err => {
-      console.log("服务连接失败，请重试");
+      console.log("socket服务连接失败，请重试");
     });
-
+    uni.onSocketClose(data => {
+      if (this.isRecord) {
+        this.recorderManager.stop();
+        this.isAnimotion = false;
+        this.isRecord = false;
+        this.getData();
+      }
+    });
     uni.onSocketMessage((res: any) => {
       console.log("收到服务器返回消息", res);
       let reponse = JSON.parse(res.data);
       if (reponse.code === 0) {
-        let word = "";
-        reponse.data.result.ws.forEach(({ cw }: any) => {
-          cw.forEach(({ w }: any) => {
-            word += w;
+        let str = "";
+        this.iatResult[reponse.data.result.sn] = reponse.data.result;
+        if (reponse.data.result.pgs == "rpl") {
+          reponse.data.result.rg.forEach((i: any) => {
+            this.iatResult[i] = null;
           });
+        }
+        this.iatResult.forEach(i => {
+          if (i != null) {
+            i.ws.forEach((j: any) => {
+              j.cw.forEach((k: any) => {
+                str += k.w;
+              });
+            });
+          }
         });
-        this.searchWodr += word;
+        this.searchWodr = str;
       }
       if (this.isLastFrame) {
         this.onRecordOver();
@@ -242,14 +266,17 @@ export default class Index extends Vue {
 
   //录音结束
   onRecordOver() {
-    this.isRecord = false;
-    this.isAnimotion = false;
-    uni.closeSocket();
-    this.getData();
+    if (this.isRecord) {
+      uni.closeSocket();
+      this.isAnimotion = false;
+      this.isRecord = false;
+      this.getData();
+    }
   }
   //开始录音
   async startRecord() {
-    if (this.isRecord || this.isAnimotion) {
+    console.log("startRecord", this.isRecord, this.isAnimotion, !this.isUp);
+    if (this.isRecord || this.isAnimotion || !this.isUp) {
       return;
     }
     this.isAnimotion = true;
@@ -257,23 +284,25 @@ export default class Index extends Vue {
       this.intervalTime += 0.5;
       if (this.intervalTime >= 0.5 && !this.isRecord) {
         uni.connectSocket({ url: this.getAuthStr() });
-        this.isRecord = true;
-        this.intervalTime = 0;
-        this.recorderManager.start(this.options);
       }
     }, 300);
   }
   //结束录音
   endRecord() {
     clearInterval(this.timer);
+    this.isAnimotion = false;
     if (this.intervalTime <= 0.5) {
-      this.isAnimotion = false;
-      console.log("endRecord");
+      this.isUp = true;
     }
 
     if (this.isRecord) {
+      uni.showLoading({
+        title: "正在解析",
+        mask: true
+      });
       setTimeout(() => {
         this.recorderManager.stop();
+        this.isUp = true;
       }, 300); //延迟小段时间停止录音, 更好的体验
     }
   }
