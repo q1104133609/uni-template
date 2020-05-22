@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-21 19:57:51
+ * @LastEditTime: 2020-05-22 11:11:09
  -->
 <!--  -->
 <template>
@@ -35,7 +35,7 @@
         <view
           class="noraml_Text"
           style="font-size:40upx;margin-top:40upx"
-          v-if="!isRecord"
+          v-if="!isRecord&&items.length>0"
         >为你找到如下结果：</view>
         <myBlock
           v-for="item in items"
@@ -45,15 +45,28 @@
           :url="item.appUrl"
           :viewAppId="item.id"
         />
+        <view v-if="items.length<=0&&!isRecord">
+          <view
+            class="noraml_Text"
+            style="font-size:40upx;margin-top:4upx;margin-bottom:50upx"
+          >未找到结果，你可以这样问：</view>
+          <view
+            class="noraml_Text"
+            style="margin-top:37upx"
+            v-for="item in queryCommonTips"
+            :key="item.id"
+            @click="toSearch(item.tipContent)"
+          >“{{item.tipContent}}”</view>
+        </view>
       </view>
 
-      <view class="noraml_Text" v-else-if="isRecord">
+      <view class="noraml_Text" v-else-if="isRecord||isAnimotion">
         正在听
         <br />请继续…
       </view>
-      <view class="noraml_Text" v-else-if="isAnimotion">准备中...</view>
+      <!-- <view class="noraml_Text" v-else-if="isAnimotion">准备中...</view> -->
       <view v-else>
-        <view class="hint_Text mT20" v-if="employeeInfo">你好，{{employeeInfo.name}}</view>
+        <view class="hint_Text mT20" v-if="employeeInfo&&employeeInfo.name">你好，{{employeeInfo.name}}</view>
         <view class="big_Text" style="margin-top:4upx;margin-bottom:50upx">你可以这样问：</view>
         <view
           class="noraml_Text"
@@ -65,7 +78,7 @@
       </view>
     </scroll-view>
     <view class="bottom_view">
-      <div class="gradient-text" v-if="!isRecord&&!searchWodr">轻按再松开,说出你想搜索的内容</div>
+      <div class="gradient-text" v-if="!isRecord&&!searchWodr">轻轻按住，说出你想搜索的内容</div>
       <view class="row_center video_view">
         <image src="../../static/images/history.png" class="history" @click.stop="toHistory" />
         <Recode :isRecord="isAnimotion" @startRecord="startRecord" @endRecord="endRecord" />
@@ -157,6 +170,9 @@ export default class Index extends Vue {
   mounted() {
     //录音开始
     this.recorderManager.onStart(() => {
+      console.log("开始回调================");
+      if (!this.isAnimotion) return;
+      console.log("确定开始录音开始回调================");
       this.isRecord = true;
       this.intervalTime = 0;
       this.isLastFrame = false;
@@ -166,7 +182,7 @@ export default class Index extends Vue {
     });
     //录音结束
     this.recorderManager.onStop(res => {
-      this.isAnimotion = false;
+      console.log("录音结束回调=========");
     });
     //录音回调
     this.recorderManager.onFrameRecorded((res: any) => {
@@ -200,7 +216,13 @@ export default class Index extends Vue {
       }
       params.data.status = status;
 
-      console.log("发送参数:", status);
+      console.log(
+        "发送参数:",
+        status,
+        `isRecord:${this.isRecord}`,
+        `isAnimotion:${this.isAnimotion}`,
+        `isUp:${this.isUp}`
+      );
 
       uni.sendSocketMessage({
         data: JSON.stringify(params),
@@ -222,13 +244,14 @@ export default class Index extends Vue {
     });
     uni.onSocketOpen(data => {
       this.iatResult = [];
-      console.log("服务连接成功");
+      console.log("链接socket=============");
       this.recorderManager.start(this.options);
     });
     uni.onSocketError(err => {
       console.log("socket服务连接失败，请重试");
     });
     uni.onSocketClose(data => {
+      console.log("关闭socket=========");
       if (this.isRecord) {
         this.recorderManager.stop();
         this.isAnimotion = false;
@@ -279,6 +302,7 @@ export default class Index extends Vue {
     if (this.isRecord || this.isAnimotion || !this.isUp) {
       return;
     }
+    this.isUp = false;
     this.isAnimotion = true;
     this.timer = setInterval(() => {
       this.intervalTime += 0.5;
@@ -289,22 +313,19 @@ export default class Index extends Vue {
   }
   //结束录音
   endRecord() {
+    console.log("放弃code=========");
     clearInterval(this.timer);
     this.isAnimotion = false;
+    this.isUp = true;
     if (this.intervalTime <= 0.5) {
-      this.isUp = true;
+      console.log("时间过短=========");
+      uni.closeSocket();
     }
-
-    if (this.isRecord) {
-      uni.showLoading({
-        title: "正在解析",
-        mask: true
-      });
-      setTimeout(() => {
-        this.recorderManager.stop();
-        this.isUp = true;
-      }, 300); //延迟小段时间停止录音, 更好的体验
-    }
+    this.intervalTime = 0;
+    setTimeout(() => {
+      console.log("关闭音频=========");
+      this.recorderManager.stop();
+    }, 300); //延迟小段时间停止录音, 更好的体验
   }
 
   // 鉴权签名

@@ -399,6 +399,9 @@ var Index = /*#__PURE__*/function (_Vue) {
 
       //录音开始
       this.recorderManager.onStart(function () {
+        console.log("开始回调================");
+        if (!_this4.isAnimotion) return;
+        console.log("确定开始录音开始回调================");
         _this4.isRecord = true;
         _this4.intervalTime = 0;
         _this4.isLastFrame = false;
@@ -408,7 +411,7 @@ var Index = /*#__PURE__*/function (_Vue) {
       }); //录音结束
 
       this.recorderManager.onStop(function (res) {
-        _this4.isAnimotion = false;
+        console.log("录音结束回调=========");
       }); //录音回调
 
       this.recorderManager.onFrameRecorded(function (res) {
@@ -446,7 +449,7 @@ var Index = /*#__PURE__*/function (_Vue) {
         }
 
         params.data.status = status;
-        console.log("发送参数:", status);
+        console.log("发送参数:", status, "isRecord:".concat(_this4.isRecord), "isAnimotion:".concat(_this4.isAnimotion), "isUp:".concat(_this4.isUp));
         uni.sendSocketMessage({
           data: JSON.stringify(params),
           success: function success(data) {
@@ -470,7 +473,7 @@ var Index = /*#__PURE__*/function (_Vue) {
       });
       uni.onSocketOpen(function (data) {
         _this4.iatResult = [];
-        console.log("服务连接成功");
+        console.log("链接socket=============");
 
         _this4.recorderManager.start(_this4.options);
       });
@@ -478,6 +481,8 @@ var Index = /*#__PURE__*/function (_Vue) {
         console.log("socket服务连接失败，请重试");
       });
       uni.onSocketClose(function (data) {
+        console.log("关闭socket=========");
+
         if (_this4.isRecord) {
           _this4.recorderManager.stop();
 
@@ -551,6 +556,7 @@ var Index = /*#__PURE__*/function (_Vue) {
                 return _context3.abrupt("return");
 
               case 3:
+                this.isUp = false;
                 this.isAnimotion = true;
                 this.timer = setInterval(function () {
                   _this5.intervalTime += 0.5;
@@ -562,7 +568,7 @@ var Index = /*#__PURE__*/function (_Vue) {
                   }
                 }, 300);
 
-              case 5:
+              case 6:
               case "end":
                 return _context3.stop();
             }
@@ -582,24 +588,22 @@ var Index = /*#__PURE__*/function (_Vue) {
     value: function endRecord() {
       var _this6 = this;
 
+      console.log("放弃code=========");
       clearInterval(this.timer);
       this.isAnimotion = false;
+      this.isUp = true;
 
       if (this.intervalTime <= 0.5) {
-        this.isUp = true;
+        console.log("时间过短=========");
+        uni.closeSocket();
       }
 
-      if (this.isRecord) {
-        uni.showLoading({
-          title: "正在解析",
-          mask: true
-        });
-        setTimeout(function () {
-          _this6.recorderManager.stop();
+      this.intervalTime = 0;
+      setTimeout(function () {
+        console.log("关闭音频=========");
 
-          _this6.isUp = true;
-        }, 300); //延迟小段时间停止录音, 更好的体验
-      }
+        _this6.recorderManager.stop();
+      }, 300); //延迟小段时间停止录音, 更好的体验
     } // 鉴权签名
 
   }, {
