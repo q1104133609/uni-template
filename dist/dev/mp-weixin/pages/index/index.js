@@ -264,6 +264,7 @@ var Index = /*#__PURE__*/function (_Vue) {
 
     _this.isfocus = false; //是否有焦点
 
+    _this.isWaitBack = false;
     _this.isAnimotion = false;
     _this.height = "calc(100vh - ".concat(getApp().globalData.CustomBar + 320, "rpx)");
     _this.searchWodr = ""; //搜索内容
@@ -271,7 +272,7 @@ var Index = /*#__PURE__*/function (_Vue) {
     _this.options = {
       duration: 1000 * 60,
       sampleRate: 16000,
-      numberOfChannels: 2,
+      numberOfChannels: 1,
       encodeBitRate: 48000,
       format: "mp3",
       frameSize: 3
@@ -343,22 +344,22 @@ var Index = /*#__PURE__*/function (_Vue) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                uni.hideLoading();
-
                 if (!this.searchWodr) {
-                  _context2.next = 6;
+                  _context2.next = 7;
                   break;
                 }
 
-                _context2.next = 4;
+                _context2.next = 3;
                 return (0, _request.get)("/api/wechat/app/search/index/query", {
                   searchParam: this.searchWodr
                 });
 
-              case 4:
+              case 3:
                 res = _context2.sent;
 
                 if (res.success) {
+                  this.isWaitBack = false;
+
                   if (res.rows.length === 1) {
                     getApp().globalData.url = res.rows[0].appUrl;
                     getApp().globalData.title = res.rows[0].appName;
@@ -377,7 +378,13 @@ var Index = /*#__PURE__*/function (_Vue) {
                   }
                 }
 
-              case 6:
+                _context2.next = 8;
+                break;
+
+              case 7:
+                this.isWaitBack = false;
+
+              case 8:
               case "end":
                 return _context2.stop();
             }
@@ -456,12 +463,9 @@ var Index = /*#__PURE__*/function (_Vue) {
             console.log("send success:" + JSON.stringify(data));
           },
           fail: function fail(err) {
-            _this4.isLastFrame = true;
-
-            _this4.recorderManager.stop();
-
-            _this4.onRecordOver();
-
+            // this.isLastFrame = true;
+            // this.recorderManager.stop();
+            // this.onRecordOver();
             console.log("send error:" + JSON.stringify(err));
           },
           complete: function complete() {
@@ -478,7 +482,7 @@ var Index = /*#__PURE__*/function (_Vue) {
         _this4.recorderManager.start(_this4.options);
       });
       uni.onSocketError(function (err) {
-        console.log("socket服务连接失败，请重试");
+        console.log("socket服务连接失败，请重试", err);
       });
       uni.onSocketClose(function (data) {
         console.log("关闭socket=========");
@@ -520,16 +524,18 @@ var Index = /*#__PURE__*/function (_Vue) {
         }
 
         if (_this4.isLastFrame) {
-          _this4.onRecordOver();
+          console.log("正常结束========onRecordOver=======");
+
+          _this4.onRecordOver(reponse.data.status === 2);
         }
       });
     } //录音结束
 
   }, {
     key: "onRecordOver",
-    value: function onRecordOver() {
+    value: function onRecordOver(isNoamlOver) {
       if (this.isRecord) {
-        uni.closeSocket();
+        if (!isNoamlOver) uni.closeSocket();
         this.isAnimotion = false;
         this.isRecord = false;
         this.getData();
@@ -588,6 +594,7 @@ var Index = /*#__PURE__*/function (_Vue) {
     value: function endRecord() {
       var _this6 = this;
 
+      if (this.isUp) return;
       console.log("放弃code=========");
       clearInterval(this.timer);
       this.isAnimotion = false;
@@ -598,6 +605,7 @@ var Index = /*#__PURE__*/function (_Vue) {
         uni.closeSocket();
       }
 
+      this.isWaitBack = true;
       this.intervalTime = 0;
       setTimeout(function () {
         console.log("关闭音频=========");
@@ -623,7 +631,7 @@ var Index = /*#__PURE__*/function (_Vue) {
       var authStr = _cryptoJs.default.enc.Base64.stringify(_cryptoJs.default.enc.Utf8.parse(authorizationOrigin));
 
       var url = "wss://iat-api.xfyun.cn/v2/iat";
-      url = "".concat(url, "?authorization=").concat(authStr, "&date=").concat(date, "&host=").concat(host);
+      url = "".concat(url, "?authorization=").concat(encodeURI(authStr), "&date=").concat(encodeURI(date), "&host=").concat(encodeURI(host));
       return url;
     } //点击搜索
 

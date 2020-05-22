@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-22 11:11:09
+ * @LastEditTime: 2020-05-22 17:22:13
  -->
 <!--  -->
 <template>
@@ -45,7 +45,7 @@
           :url="item.appUrl"
           :viewAppId="item.id"
         />
-        <view v-if="items.length<=0&&!isRecord">
+        <view v-if="items.length<=0&&!isRecord&&!isWaitBack">
           <view
             class="noraml_Text"
             style="font-size:40upx;margin-top:4upx;margin-bottom:50upx"
@@ -105,13 +105,14 @@ export default class Index extends Vue {
   isLastFrame = false; //是否最后一帧
   firstSend = true; //是否第一次
   isfocus = false; //是否有焦点
+  isWaitBack = false;
   isAnimotion = false;
   height = `calc(100vh - ${getApp().globalData!.CustomBar + 320}rpx)`;
   searchWodr = ""; //搜索内容
   options = {
     duration: 1000 * 60,
     sampleRate: 16000,
-    numberOfChannels: 2,
+    numberOfChannels: 1,
     encodeBitRate: 48000,
     format: "mp3",
     frameSize: 3
@@ -140,12 +141,12 @@ export default class Index extends Vue {
 
   //搜索数据
   async getData() {
-    uni.hideLoading();
     if (this.searchWodr) {
       const res = await get("/api/wechat/app/search/index/query", {
         searchParam: this.searchWodr
       });
       if (res.success) {
+        this.isWaitBack = false;
         if (res.rows.length === 1) {
           getApp().globalData!.url = res.rows[0].appUrl;
           getApp().globalData!.title = res.rows[0].appName;
@@ -163,6 +164,8 @@ export default class Index extends Vue {
           this.items = res.rows;
         }
       }
+    } else {
+      this.isWaitBack = false;
     }
   }
 
@@ -230,9 +233,9 @@ export default class Index extends Vue {
           console.log("send success:" + JSON.stringify(data));
         },
         fail: err => {
-          this.isLastFrame = true;
-          this.recorderManager.stop();
-          this.onRecordOver();
+          // this.isLastFrame = true;
+          // this.recorderManager.stop();
+          // this.onRecordOver();
           console.log("send error:" + JSON.stringify(err));
         },
         complete: () => {
@@ -248,7 +251,7 @@ export default class Index extends Vue {
       this.recorderManager.start(this.options);
     });
     uni.onSocketError(err => {
-      console.log("socket服务连接失败，请重试");
+      console.log("socket服务连接失败，请重试", err);
     });
     uni.onSocketClose(data => {
       console.log("关闭socket=========");
@@ -282,15 +285,16 @@ export default class Index extends Vue {
         this.searchWodr = str;
       }
       if (this.isLastFrame) {
-        this.onRecordOver();
+        console.log("正常结束========onRecordOver=======");
+        this.onRecordOver(reponse.data.status === 2);
       }
     });
   }
 
   //录音结束
-  onRecordOver() {
+  onRecordOver(isNoamlOver: boolean) {
     if (this.isRecord) {
-      uni.closeSocket();
+      if (!isNoamlOver) uni.closeSocket();
       this.isAnimotion = false;
       this.isRecord = false;
       this.getData();
@@ -313,6 +317,7 @@ export default class Index extends Vue {
   }
   //结束录音
   endRecord() {
+    if (this.isUp) return;
     console.log("放弃code=========");
     clearInterval(this.timer);
     this.isAnimotion = false;
@@ -321,6 +326,7 @@ export default class Index extends Vue {
       console.log("时间过短=========");
       uni.closeSocket();
     }
+    this.isWaitBack = true;
     this.intervalTime = 0;
     setTimeout(() => {
       console.log("关闭音频=========");
@@ -345,7 +351,9 @@ export default class Index extends Vue {
     );
 
     let url = "wss://iat-api.xfyun.cn/v2/iat";
-    url = `${url}?authorization=${authStr}&date=${date}&host=${host}`;
+    url = `${url}?authorization=${encodeURI(authStr)}&date=${encodeURI(
+      date
+    )}&host=${encodeURI(host)}`;
     return url;
   }
   //点击搜索
