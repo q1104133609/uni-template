@@ -358,8 +358,6 @@ var Index = /*#__PURE__*/function (_Vue) {
                 res = _context2.sent;
 
                 if (res.success) {
-                  this.isWaitBack = false;
-
                   if (res.rows.length === 1) {
                     getApp().globalData.url = res.rows[0].appUrl;
                     getApp().globalData.title = res.rows[0].appName;
@@ -369,12 +367,14 @@ var Index = /*#__PURE__*/function (_Vue) {
                       success: function success() {
                         var naTo = setInterval(function () {
                           clearInterval(naTo);
+                          _this3.isWaitBack = false;
                           _this3.items = res.rows;
                         }, 500);
                       }
                     });
                   } else {
                     this.items = res.rows;
+                    this.isWaitBack = false;
                   }
                 }
 
@@ -418,6 +418,7 @@ var Index = /*#__PURE__*/function (_Vue) {
       }); //录音结束
 
       this.recorderManager.onStop(function (res) {
+        uni.closeSocket();
         console.log("录音结束回调=========");
       }); //录音回调
 
@@ -562,7 +563,10 @@ var Index = /*#__PURE__*/function (_Vue) {
                 return _context3.abrupt("return");
 
               case 3:
+                console.log("开始动画=========");
+                this.searchWodr = "";
                 this.isUp = false;
+                this.items = [];
                 this.isAnimotion = true;
                 this.timer = setInterval(function () {
                   _this5.intervalTime += 0.5;
@@ -574,7 +578,7 @@ var Index = /*#__PURE__*/function (_Vue) {
                   }
                 }, 300);
 
-              case 6:
+              case 9:
               case "end":
                 return _context3.stop();
             }

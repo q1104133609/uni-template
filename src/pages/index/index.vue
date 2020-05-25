@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-22 17:22:13
+ * @LastEditTime: 2020-05-25 19:25:15
  -->
 <!--  -->
 <template>
@@ -60,11 +60,11 @@
         </view>
       </view>
 
-      <view class="noraml_Text" v-else-if="isRecord||isAnimotion">
+      <view class="noraml_Text" v-else-if="isRecord">
         正在听
         <br />请继续…
       </view>
-      <!-- <view class="noraml_Text" v-else-if="isAnimotion">准备中...</view> -->
+      <view class="noraml_Text" v-else-if="isAnimotion">准备中...</view>
       <view v-else>
         <view class="hint_Text mT20" v-if="employeeInfo&&employeeInfo.name">你好，{{employeeInfo.name}}</view>
         <view class="big_Text" style="margin-top:4upx;margin-bottom:50upx">你可以这样问：</view>
@@ -146,7 +146,6 @@ export default class Index extends Vue {
         searchParam: this.searchWodr
       });
       if (res.success) {
-        this.isWaitBack = false;
         if (res.rows.length === 1) {
           getApp().globalData!.url = res.rows[0].appUrl;
           getApp().globalData!.title = res.rows[0].appName;
@@ -156,12 +155,14 @@ export default class Index extends Vue {
             success: () => {
               let naTo = setInterval(() => {
                 clearInterval(naTo);
+                this.isWaitBack = false;
                 this.items = res.rows;
               }, 500);
             }
           });
         } else {
           this.items = res.rows;
+          this.isWaitBack = false;
         }
       }
     } else {
@@ -185,6 +186,7 @@ export default class Index extends Vue {
     });
     //录音结束
     this.recorderManager.onStop(res => {
+      uni.closeSocket();
       console.log("录音结束回调=========");
     });
     //录音回调
@@ -306,7 +308,10 @@ export default class Index extends Vue {
     if (this.isRecord || this.isAnimotion || !this.isUp) {
       return;
     }
+    console.log("开始动画=========");
+    this.searchWodr = "";
     this.isUp = false;
+    this.items = [];
     this.isAnimotion = true;
     this.timer = setInterval(() => {
       this.intervalTime += 0.5;
