@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-04-13 13:28:51
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-20 10:48:25
+ * @LastEditTime: 2020-05-26 15:30:45
  -->
 <template>
   <view style="width:100vw">
@@ -23,11 +23,12 @@
 <script lang="ts">
 import cuCustom from "@/assets/colorui/components/cu-custom.vue";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { State } from "vuex-class";
 @Component({
   components: { cuCustom }
 })
 export default class extends Vue {
-  CustomBar = getApp().globalData!.CustomBar;
+  @State CustomBar!: number;
   @Prop()
   private title!: string;
   @Prop({
@@ -35,6 +36,5 @@ export default class extends Vue {
     default: false
   })
   private isback!: [Boolean, String];
-
 }
 </script>

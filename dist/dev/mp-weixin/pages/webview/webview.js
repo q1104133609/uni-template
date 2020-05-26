@@ -150,6 +150,8 @@ var _vuePropertyDecorator = __webpack_require__(/*! vue-property-decorator */ 26
 
 var _request = __webpack_require__(/*! ../../plugins/request */ 28);
 
+var _vuexClass = __webpack_require__(/*! vuex-class */ 9);
+
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -193,7 +195,6 @@ var WebView = /*#__PURE__*/function (_Vue) {
     _this.viewAppId = getApp().globalData.viewAppId;
     _this.title = getApp().globalData.title;
     _this.userName = getApp().globalData.userName;
-    _this.CustomBar = getApp().globalData.CustomBar;
     _this.myUrl = "";
     return _this;
   }
@@ -221,6 +222,8 @@ var WebView = /*#__PURE__*/function (_Vue) {
   return WebView;
 }(_vuePropertyDecorator.Vue);
 
+(0, _tslib.__decorate)([_vuexClass.State], WebView.prototype, "CustomBar", void 0);
+(0, _tslib.__decorate)([_vuexClass.State], WebView.prototype, "StatusBar", void 0);
 WebView = (0, _tslib.__decorate)([(0, _vuePropertyDecorator.Component)({
   components: {
     cuCustom: cuCustom

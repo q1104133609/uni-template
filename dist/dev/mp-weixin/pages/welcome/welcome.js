@@ -173,7 +173,7 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 var mycontent = function mycontent() {
-  __webpack_require__.e(/*! require.ensure | components/mycontent */ "components/mycontent").then((function () {
+  Promise.all(/*! require.ensure | components/mycontent */[__webpack_require__.e("common/vendor"), __webpack_require__.e("components/mycontent")]).then((function () {
     return resolve(__webpack_require__(/*! @/components/mycontent.vue */ 239));
   }).bind(null, __webpack_require__)).catch(__webpack_require__.oe);
 };

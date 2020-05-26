@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-12 22:45:32
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-16 10:25:31
+ * @LastEditTime: 2020-05-26 14:56:23
  -->
 <!--  -->
 <template>
@@ -19,6 +19,7 @@
 
 <script lang='ts'>
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { mapState } from 'vuex';
 @Component({ components: {}, name: "Block" })
 export default class extends Vue {
   @Prop({ default: "" })

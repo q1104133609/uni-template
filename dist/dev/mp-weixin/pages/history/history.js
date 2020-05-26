@@ -152,6 +152,8 @@ var _vuePropertyDecorator = __webpack_require__(/*! vue-property-decorator */ 26
 
 var _request = __webpack_require__(/*! ../../plugins/request */ 28);
 
+var _vuexClass = __webpack_require__(/*! vuex-class */ 9);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -181,7 +183,7 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 var mycontent = function mycontent() {
-  __webpack_require__.e(/*! require.ensure | components/mycontent */ "components/mycontent").then((function () {
+  Promise.all(/*! require.ensure | components/mycontent */[__webpack_require__.e("common/vendor"), __webpack_require__.e("components/mycontent")]).then((function () {
     return resolve(__webpack_require__(/*! @/components/mycontent.vue */ 239));
   }).bind(null, __webpack_require__)).catch(__webpack_require__.oe);
 };
@@ -204,7 +206,6 @@ var default_1 = /*#__PURE__*/function (_Vue) {
 
     _this = _super.apply(this, arguments);
     _this.items = [];
-    _this.height = "calc(100vh - ".concat(getApp().globalData.CustomBar + 140, "rpx)");
     return _this;
   }
 
@@ -244,11 +245,17 @@ var default_1 = /*#__PURE__*/function (_Vue) {
   }, {
     key: "mounted",
     value: function mounted() {}
+  }, {
+    key: "height",
+    get: function get() {
+      return "calc(100vh - ".concat(this.CustomBar + 320, "rpx)");
+    }
   }]);
 
   return default_1;
 }(_vuePropertyDecorator.Vue);
 
+(0, _tslib.__decorate)([_vuexClass.State], default_1.prototype, "CustomBar", void 0);
 default_1 = (0, _tslib.__decorate)([(0, _vuePropertyDecorator.Component)({
   components: {
     mycontent: mycontent,

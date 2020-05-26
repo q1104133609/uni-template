@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-25 19:25:15
+ * @LastEditTime: 2020-05-26 15:30:13
  -->
 <!--  -->
 <template>
@@ -78,7 +78,7 @@
       </view>
     </scroll-view>
     <view class="bottom_view">
-      <div class="gradient-text" v-if="!isRecord&&!searchWodr">轻轻按住，说出你想搜索的内容</div>
+      <div class="gradient-text" v-if="!isRecord&&!searchWodr&&!isAnimotion">轻轻按住，说出你想搜索的内容</div>
       <view class="row_center video_view">
         <image src="../../static/images/history.png" class="history" @click.stop="toHistory" />
         <Recode :isRecord="isAnimotion" @startRecord="startRecord" @endRecord="endRecord" />
@@ -96,10 +96,12 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import CryptoJS from "../../../node_modules/crypto-js/crypto-js.js";
 import { getAuth } from "../../utils/util";
 import { get } from "../../plugins/request";
+import { State } from "vuex-class";
 //@ts-ignore
 const base64 = require("@/utils/base64.js");
 @Component({ components: { mycontent, myBlock, Recode }, name: "Index" })
 export default class Index extends Vue {
+  @State CustomBar!: number;
   recorderManager = uni.getRecorderManager();
   items: any[] = [];
   isLastFrame = false; //是否最后一帧
@@ -107,7 +109,9 @@ export default class Index extends Vue {
   isfocus = false; //是否有焦点
   isWaitBack = false;
   isAnimotion = false;
-  height = `calc(100vh - ${getApp().globalData!.CustomBar + 320}rpx)`;
+  get height() {
+    return `calc(100vh - ${this.CustomBar + 320}rpx)`;
+  }
   searchWodr = ""; //搜索内容
   options = {
     duration: 1000 * 60,
@@ -124,7 +128,7 @@ export default class Index extends Vue {
   intervalTime = 0;
   timer: any = null;
   isRecord = false;
-  isUp = true;
+  isEnd = false;
   iatResult: any[] = [];
 
   async created() {
@@ -157,7 +161,7 @@ export default class Index extends Vue {
                 clearInterval(naTo);
                 this.isWaitBack = false;
                 this.items = res.rows;
-              }, 500);
+              }, 1000);
             }
           });
         } else {
@@ -176,7 +180,8 @@ export default class Index extends Vue {
     this.recorderManager.onStart(() => {
       console.log("开始回调================");
       if (!this.isAnimotion) return;
-      console.log("确定开始录音开始回调================");
+      uni.vibrateShort();
+      console.log("~~~~~~~~~~~~~~确定开始录音开始回调================");
       this.isRecord = true;
       this.intervalTime = 0;
       this.isLastFrame = false;
@@ -225,8 +230,7 @@ export default class Index extends Vue {
         "发送参数:",
         status,
         `isRecord:${this.isRecord}`,
-        `isAnimotion:${this.isAnimotion}`,
-        `isUp:${this.isUp}`
+        `isAnimotion:${this.isAnimotion}`
       );
 
       uni.sendSocketMessage({
@@ -250,6 +254,7 @@ export default class Index extends Vue {
     uni.onSocketOpen(data => {
       this.iatResult = [];
       console.log("链接socket=============");
+      if (this.isEnd) return;
       this.recorderManager.start(this.options);
     });
     uni.onSocketError(err => {
@@ -303,14 +308,16 @@ export default class Index extends Vue {
     }
   }
   //开始录音
-  async startRecord() {
-    console.log("startRecord", this.isRecord, this.isAnimotion, !this.isUp);
-    if (this.isRecord || this.isAnimotion || !this.isUp) {
+  async startRecord(e: any) {
+    console.log("startRecord", this.isRecord, this.isAnimotion, this.isEnd);
+
+    if (this.isRecord || this.isAnimotion || this.isEnd) {
+      console.log("startRecord mover=========");
       return;
     }
     console.log("开始动画=========");
     this.searchWodr = "";
-    this.isUp = false;
+    this.isEnd = false;
     this.items = [];
     this.isAnimotion = true;
     this.timer = setInterval(() => {
@@ -322,21 +329,25 @@ export default class Index extends Vue {
   }
   //结束录音
   endRecord() {
-    if (this.isUp) return;
+    console.log(
+      "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@触发手指离开----------------"
+    );
+    this.isEnd = true;
+    uni.vibrateShort();
     console.log("放弃code=========");
     clearInterval(this.timer);
     this.isAnimotion = false;
-    this.isUp = true;
     if (this.intervalTime <= 0.5) {
       console.log("时间过短=========");
       uni.closeSocket();
     }
-    this.isWaitBack = true;
-    this.intervalTime = 0;
     setTimeout(() => {
+      this.isEnd = false;
       console.log("关闭音频=========");
       this.recorderManager.stop();
     }, 300); //延迟小段时间停止录音, 更好的体验
+    this.isWaitBack = true;
+    this.intervalTime = 0;
   }
 
   // 鉴权签名
@@ -390,7 +401,7 @@ export default class Index extends Vue {
   position: fixed;
   bottom: 40upx;
   left: 0upx;
-  z-index: 1;
+  z-index: 2;
   width: 100%;
 
   .video_view {

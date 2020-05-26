@@ -123,6 +123,8 @@ var _tslib = __webpack_require__(/*! tslib */ 25);
 
 var _vuePropertyDecorator = __webpack_require__(/*! vue-property-decorator */ 26);
 
+var _vuexClass = __webpack_require__(/*! vuex-class */ 9);
+
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -153,18 +155,15 @@ var default_1 = /*#__PURE__*/function (_Vue) {
   var _super = _createSuper(default_1);
 
   function default_1() {
-    var _this;
-
     _classCallCheck(this, default_1);
 
-    _this = _super.apply(this, arguments);
-    _this.CustomBar = getApp().globalData.CustomBar;
-    return _this;
+    return _super.apply(this, arguments);
   }
 
   return default_1;
 }(_vuePropertyDecorator.Vue);
 
+(0, _tslib.__decorate)([_vuexClass.State], default_1.prototype, "CustomBar", void 0);
 (0, _tslib.__decorate)([(0, _vuePropertyDecorator.Prop)()], default_1.prototype, "title", void 0);
 (0, _tslib.__decorate)([(0, _vuePropertyDecorator.Prop)({
   type: [Boolean, String],

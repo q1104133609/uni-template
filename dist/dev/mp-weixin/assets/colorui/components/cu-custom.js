@@ -123,6 +123,8 @@ var _tslib = __webpack_require__(/*! tslib */ 25);
 
 var _vuePropertyDecorator = __webpack_require__(/*! vue-property-decorator */ 26);
 
+var _vuexClass = __webpack_require__(/*! vuex-class */ 9);
+
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -151,20 +153,15 @@ var CuCustom = /*#__PURE__*/function (_Vue) {
   var _super = _createSuper(CuCustom);
 
   function CuCustom() {
-    var _this;
-
     _classCallCheck(this, CuCustom);
 
-    _this = _super.apply(this, arguments);
-    _this.StatusBar = getApp().globalData.StatusBar;
-    _this.CustomBar = getApp().globalData.CustomBar;
-    return _this;
+    return _super.apply(this, arguments);
   }
 
   _createClass(CuCustom, [{
     key: "BackPage",
     value: function BackPage() {
-      this.$emit('back');
+      this.$emit("back");
       uni.navigateBack({
         delta: 1
       });
@@ -172,9 +169,7 @@ var CuCustom = /*#__PURE__*/function (_Vue) {
   }, {
     key: "style",
     get: function get() {
-      var StatusBar = getApp().globalData.StatusBar;
-      var CustomBar = getApp().globalData.CustomBar;
-      var style = "height:".concat(CustomBar, "px;padding-top:").concat(StatusBar, "px;");
+      var style = "height:".concat(this.CustomBar, "px;padding-top:").concat(this.StatusBar, "px;");
 
       if (this.bgColor) {
         style = "".concat(style, "background:").concat(this.bgColor);
@@ -187,6 +182,8 @@ var CuCustom = /*#__PURE__*/function (_Vue) {
   return CuCustom;
 }(_vuePropertyDecorator.Vue);
 
+(0, _tslib.__decorate)([_vuexClass.State], CuCustom.prototype, "CustomBar", void 0);
+(0, _tslib.__decorate)([_vuexClass.State], CuCustom.prototype, "StatusBar", void 0);
 (0, _tslib.__decorate)([(0, _vuePropertyDecorator.Prop)({
   type: [Boolean, String],
   default: false

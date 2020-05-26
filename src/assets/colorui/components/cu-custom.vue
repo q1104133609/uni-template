@@ -3,15 +3,12 @@
  * @Author: 小白
  * @Date: 2019-09-17 02:03:28
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-20 10:46:08
+ * @LastEditTime: 2020-05-26 15:27:23
  -->
 <template>
   <view>
     <view class="cu-custom" :style="[{height:CustomBar + 'px'}]">
-      <view
-        class="cu-bar fixed text-white"
-        :style="style"
-      >
+      <view class="cu-bar fixed text-white" :style="style">
         <view class="action" @tap="BackPage" v-if="isback">
           <text class="cuIcon-back" style="color:#9397AA"></text>
           <slot name="backText"></slot>
@@ -29,12 +26,13 @@
 <script  lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { get } from "../../../plugins/request";
+import { Action, State } from "vuex-class";
 @Component({
   name: "cu-custom"
 })
 export default class CuCustom extends Vue {
-  StatusBar = getApp().globalData!.StatusBar;
-  CustomBar = getApp().globalData!.CustomBar;
+  @State CustomBar!: number;
+  @State StatusBar!: number;
   @Prop({
     type: [Boolean, String],
     default: false
@@ -46,9 +44,7 @@ export default class CuCustom extends Vue {
   })
   private bgColor!: string;
   get style() {
-    var StatusBar = getApp().globalData!.StatusBar;
-    var CustomBar = getApp().globalData!.CustomBar;
-    var style = `height:${CustomBar}px;padding-top:${StatusBar}px;`;
+    var style = `height:${this.CustomBar}px;padding-top:${this.StatusBar}px;`;
     if (this.bgColor) {
       style = `${style}background:${this.bgColor}`;
     }
@@ -56,7 +52,7 @@ export default class CuCustom extends Vue {
   }
 
   BackPage() {
-    this.$emit('back')
+    this.$emit("back");
     uni.navigateBack({
       delta: 1
     });

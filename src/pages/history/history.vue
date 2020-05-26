@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-12 22:52:46
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-16 10:35:55
+ * @LastEditTime: 2020-05-26 15:30:32
  -->
 <!--  -->
 <template>
@@ -30,10 +30,15 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import mycontent from "@/components/mycontent.vue";
 import myBlock from "@/components/block.vue";
 import { get } from "../../plugins/request";
+import { State } from "vuex-class";
 @Component({ components: { mycontent, myBlock }, name: "History" })
 export default class extends Vue {
+  @State CustomBar!: number;
   items: any[] = [];
-  height = `calc(100vh - ${getApp().globalData!.CustomBar + 140}rpx)`;
+
+  get height() {
+    return `calc(100vh - ${this.CustomBar + 320}rpx)`;
+  }
   async created() {
     let res = await get("/api/wechat/view/history/query");
     if (res.success) {

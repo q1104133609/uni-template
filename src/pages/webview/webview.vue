@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 23:40:09
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-19 12:41:45
+ * @LastEditTime: 2020-05-26 15:29:17
  -->
 <!--  -->
 <template>
@@ -22,13 +22,15 @@
 import cuCustom from "@/assets/colorui/components/cu-custom.vue";
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { post, get } from "../../plugins/request";
+import { State } from "vuex-class";
 @Component({ components: { cuCustom }, name: "WebView" })
 export default class WebView extends Vue {
+  @State CustomBar!: number;
+  @State StatusBar!: number;
   url = getApp().globalData!!.url;
   viewAppId = getApp().globalData!!.viewAppId;
   title = getApp().globalData!!.title;
   userName = getApp().globalData!!.userName;
-  CustomBar = getApp().globalData!.CustomBar;
   myUrl = "";
   created() {
     uni.login({

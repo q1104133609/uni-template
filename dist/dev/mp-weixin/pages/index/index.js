@@ -196,6 +196,8 @@ var _util = __webpack_require__(/*! ../../utils/util */ 29);
 
 var _request = __webpack_require__(/*! ../../plugins/request */ 28);
 
+var _vuexClass = __webpack_require__(/*! vuex-class */ 9);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -225,7 +227,7 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 var mycontent = function mycontent() {
-  __webpack_require__.e(/*! require.ensure | components/mycontent */ "components/mycontent").then((function () {
+  Promise.all(/*! require.ensure | components/mycontent */[__webpack_require__.e("common/vendor"), __webpack_require__.e("components/mycontent")]).then((function () {
     return resolve(__webpack_require__(/*! @/components/mycontent.vue */ 239));
   }).bind(null, __webpack_require__)).catch(__webpack_require__.oe);
 };
@@ -266,7 +268,6 @@ var Index = /*#__PURE__*/function (_Vue) {
 
     _this.isWaitBack = false;
     _this.isAnimotion = false;
-    _this.height = "calc(100vh - ".concat(getApp().globalData.CustomBar + 320, "rpx)");
     _this.searchWodr = ""; //搜索内容
 
     _this.options = {
@@ -284,7 +285,7 @@ var Index = /*#__PURE__*/function (_Vue) {
     _this.intervalTime = 0;
     _this.timer = null;
     _this.isRecord = false;
-    _this.isUp = true;
+    _this.isEnd = false;
     _this.iatResult = [];
     return _this;
   }
@@ -369,7 +370,7 @@ var Index = /*#__PURE__*/function (_Vue) {
                           clearInterval(naTo);
                           _this3.isWaitBack = false;
                           _this3.items = res.rows;
-                        }, 500);
+                        }, 1000);
                       }
                     });
                   } else {
@@ -408,7 +409,8 @@ var Index = /*#__PURE__*/function (_Vue) {
       this.recorderManager.onStart(function () {
         console.log("开始回调================");
         if (!_this4.isAnimotion) return;
-        console.log("确定开始录音开始回调================");
+        uni.vibrateShort();
+        console.log("~~~~~~~~~~~~~~确定开始录音开始回调================");
         _this4.isRecord = true;
         _this4.intervalTime = 0;
         _this4.isLastFrame = false;
@@ -457,7 +459,7 @@ var Index = /*#__PURE__*/function (_Vue) {
         }
 
         params.data.status = status;
-        console.log("发送参数:", status, "isRecord:".concat(_this4.isRecord), "isAnimotion:".concat(_this4.isAnimotion), "isUp:".concat(_this4.isUp));
+        console.log("发送参数:", status, "isRecord:".concat(_this4.isRecord), "isAnimotion:".concat(_this4.isAnimotion));
         uni.sendSocketMessage({
           data: JSON.stringify(params),
           success: function success(data) {
@@ -479,6 +481,7 @@ var Index = /*#__PURE__*/function (_Vue) {
       uni.onSocketOpen(function (data) {
         _this4.iatResult = [];
         console.log("链接socket=============");
+        if (_this4.isEnd) return;
 
         _this4.recorderManager.start(_this4.options);
       });
@@ -546,26 +549,27 @@ var Index = /*#__PURE__*/function (_Vue) {
   }, {
     key: "startRecord",
     value: function () {
-      var _startRecord = _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee3() {
+      var _startRecord = _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee3(e) {
         var _this5 = this;
 
         return _regenerator.default.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                console.log("startRecord", this.isRecord, this.isAnimotion, !this.isUp);
+                console.log("startRecord", this.isRecord, this.isAnimotion, this.isEnd);
 
-                if (!(this.isRecord || this.isAnimotion || !this.isUp)) {
-                  _context3.next = 3;
+                if (!(this.isRecord || this.isAnimotion || this.isEnd)) {
+                  _context3.next = 4;
                   break;
                 }
 
+                console.log("startRecord mover=========");
                 return _context3.abrupt("return");
 
-              case 3:
+              case 4:
                 console.log("开始动画=========");
                 this.searchWodr = "";
-                this.isUp = false;
+                this.isEnd = false;
                 this.items = [];
                 this.isAnimotion = true;
                 this.timer = setInterval(function () {
@@ -578,7 +582,7 @@ var Index = /*#__PURE__*/function (_Vue) {
                   }
                 }, 300);
 
-              case 9:
+              case 10:
               case "end":
                 return _context3.stop();
             }
@@ -586,7 +590,7 @@ var Index = /*#__PURE__*/function (_Vue) {
         }, _callee3, this);
       }));
 
-      function startRecord() {
+      function startRecord(_x) {
         return _startRecord.apply(this, arguments);
       }
 
@@ -598,24 +602,27 @@ var Index = /*#__PURE__*/function (_Vue) {
     value: function endRecord() {
       var _this6 = this;
 
-      if (this.isUp) return;
+      console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@触发手指离开----------------");
+      this.isEnd = true;
+      uni.vibrateShort();
       console.log("放弃code=========");
       clearInterval(this.timer);
       this.isAnimotion = false;
-      this.isUp = true;
 
       if (this.intervalTime <= 0.5) {
         console.log("时间过短=========");
         uni.closeSocket();
       }
 
-      this.isWaitBack = true;
-      this.intervalTime = 0;
       setTimeout(function () {
+        _this6.isEnd = false;
         console.log("关闭音频=========");
 
         _this6.recorderManager.stop();
       }, 300); //延迟小段时间停止录音, 更好的体验
+
+      this.isWaitBack = true;
+      this.intervalTime = 0;
     } // 鉴权签名
 
   }, {
@@ -653,11 +660,17 @@ var Index = /*#__PURE__*/function (_Vue) {
         url: "/pages/history/history"
       });
     }
+  }, {
+    key: "height",
+    get: function get() {
+      return "calc(100vh - ".concat(this.CustomBar + 320, "rpx)");
+    }
   }]);
 
   return Index;
 }(_vuePropertyDecorator.Vue);
 
+(0, _tslib.__decorate)([_vuexClass.State], Index.prototype, "CustomBar", void 0);
 Index = (0, _tslib.__decorate)([(0, _vuePropertyDecorator.Component)({
   components: {
     mycontent: mycontent,
