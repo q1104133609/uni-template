@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-26 16:29:44
+ * @LastEditTime: 2020-05-26 18:00:12
  -->
 <!--  -->
 <template>
@@ -185,7 +185,6 @@ export default class Index extends Vue {
     //录音开始
     this.recorderManager.onStart(() => {
       if (!this.isAnimotion) return;
-      uni.vibrateLong({});
       this.isRecord = true;
       this.intervalTime = 0;
       this.isLastFrame = false;
@@ -303,6 +302,14 @@ export default class Index extends Vue {
     if (this.isRecord || this.isAnimotion || this.isEnd) {
       return;
     }
+    uni.vibrateLong({
+      success: () => {
+        console.log("手指按下震动成功");
+      },
+      fail: res => {
+        console.log("手指按下震动失败", res);
+      }
+    });
     this.searchWodr = "";
     this.isEnd = false;
     this.items = [];
@@ -317,15 +324,26 @@ export default class Index extends Vue {
   //结束录音
   endRecord() {
     this.isEnd = true;
-    uni.vibrateLong({});
+    // uni.vibrateLong({
+    //   success: () => {
+    //     console.log("手指松开震动成功");
+    //   },
+    //   fail: res => {
+    //     console.log("手指松开震动失败", res);
+    //   }
+    // });
     clearInterval(this.timer);
     this.isAnimotion = false;
     if (this.intervalTime <= 0.5) {
-      uni.closeSocket();
+      try {
+        uni.closeSocket();
+      } catch (error) {}
     }
     setTimeout(() => {
       this.isEnd = false;
-      this.recorderManager.stop();
+      try {
+        this.recorderManager.stop();
+      } catch (error) {}
     }, 300); //延迟小段时间停止录音, 更好的体验
     this.isWaitBack = true;
     this.intervalTime = 0;
@@ -389,12 +407,12 @@ export default class Index extends Vue {
     margin-top: 13upx;
     position: relative;
     .history {
-      padding: 20upx;
-      height: 88upx;
-      width: 88upx;
+      padding: 30upx;
+      height: 108upx;
+      width: 108upx;
       position: absolute;
       margin: auto;
-      left: 28upx;
+      left: 18upx;
       top: 0;
       bottom: 0;
     }

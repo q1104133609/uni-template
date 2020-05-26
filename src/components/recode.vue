@@ -4,18 +4,25 @@
  * @Author: 小白
  * @Date: 2020-05-13 18:04:23
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-25 20:56:42
+ * @LastEditTime: 2020-05-26 17:59:26
  -->
 <!--  -->
 <template>
-  <view class="recode" @longpress="touchstart" @touchend.stop="$emit('endRecord')" @touchcancel.stop="$emit('endRecord')">
-    <view class="ripple" :animation="spreakingAnimation1" v-if="isRecord"></view>
-    <view class="ripple" :animation="spreakingAnimation2" v-if="isRecord">></view>
-    <view class="ripple" :animation="spreakingAnimation3" v-if="isRecord">></view>
-    <image
-      :src="isRecord?'../static/images/video1.png':'../static/images/video.png'"
-      style="width:100%;height:100%;"
-    />
+  <view
+    @longpress="touchstart"
+    @touchend.stop="$emit('endRecord')"
+    @touchcancel.stop="$emit('endRecord')"
+    class="myccc"
+  >
+    <view class="recode">
+      <view class="ripple" :animation="spreakingAnimation1" v-if="isRecord"></view>
+      <view class="ripple" :animation="spreakingAnimation2" v-if="isRecord">></view>
+      <view class="ripple" :animation="spreakingAnimation3" v-if="isRecord">></view>
+      <image
+        :src="isRecord?'../static/images/video1.png':'../static/images/video.png'"
+        style="width:100%;height:100%;"
+      />
+    </view>
   </view>
 </template>
 
@@ -56,7 +63,7 @@ export default class Rocode extends Vue {
 
   async touchstart() {
     if (await this.checkPrimisse()) {
-      this.$emit('startRecord')
+      this.$emit("startRecord");
     }
   }
   //检查权限
@@ -200,7 +207,12 @@ export default class Rocode extends Vue {
 </script>
 <style lang='scss' scoped>
 /* pages/myRecode/myRecode.wxss */
-
+.myccc {
+  width: 196rpx;
+  height: 196rpx;
+  padding: 20rpx;
+  text-align: center;
+}
 .recode {
   display: inline-block;
   width: 156rpx;
