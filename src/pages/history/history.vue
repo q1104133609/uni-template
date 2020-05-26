@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-12 22:52:46
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-26 15:30:32
+ * @LastEditTime: 2020-05-26 16:02:09
  -->
 <!--  -->
 <template>
@@ -37,7 +37,7 @@ export default class extends Vue {
   items: any[] = [];
 
   get height() {
-    return `calc(100vh - ${this.CustomBar + 320}rpx)`;
+    return `calc(100vh - ${this.CustomBar}px - 30px)`;
   }
   async created() {
     let res = await get("/api/wechat/view/history/query");

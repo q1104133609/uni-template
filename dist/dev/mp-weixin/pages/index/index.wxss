@@ -46,11 +46,12 @@
     position: relative;
 }
 .bottom_view .video_view .history.data-v-1badc801 {
-      height: 48rpx;
-      width: 48rpx;
+      padding: 20rpx;
+      height: 88rpx;
+      width: 88rpx;
       position: absolute;
       margin: auto;
-      left: 48rpx;
+      left: 28rpx;
       top: 0;
       bottom: 0;
 }

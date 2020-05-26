@@ -248,7 +248,7 @@ var default_1 = /*#__PURE__*/function (_Vue) {
   }, {
     key: "height",
     get: function get() {
-      return "calc(100vh - ".concat(this.CustomBar + 320, "rpx)");
+      return "calc(100vh - ".concat(this.CustomBar, "px - 30px)");
     }
   }]);
 

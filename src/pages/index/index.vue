@@ -4,11 +4,15 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-26 15:30:13
+ * @LastEditTime: 2020-05-26 16:29:44
  -->
 <!--  -->
 <template>
-  <mycontent title="数字旭辉" :isback="searchWodr" @back="isfocus=false;searchWodr='';isRecord = false">
+  <mycontent
+    title="数字旭辉"
+    :isback="searchWodr"
+    @back="isfocus=false;searchWodr='';isRecord = false;items = []"
+  >
     <scroll-view scroll-y :style="{'height':height}">
       <view v-if="searchWodr">
         <textarea
@@ -146,9 +150,11 @@ export default class Index extends Vue {
   //搜索数据
   async getData() {
     if (this.searchWodr) {
+      console.log(`请求参数:${this.searchWodr}`);
       const res = await get("/api/wechat/app/search/index/query", {
         searchParam: this.searchWodr
       });
+      console.log(`返回值:${res}`);
       if (res.success) {
         if (res.rows.length === 1) {
           getApp().globalData!.url = res.rows[0].appUrl;
@@ -178,10 +184,8 @@ export default class Index extends Vue {
   mounted() {
     //录音开始
     this.recorderManager.onStart(() => {
-      console.log("开始回调================");
       if (!this.isAnimotion) return;
-      uni.vibrateShort();
-      console.log("~~~~~~~~~~~~~~确定开始录音开始回调================");
+      uni.vibrateLong({});
       this.isRecord = true;
       this.intervalTime = 0;
       this.isLastFrame = false;
@@ -192,7 +196,6 @@ export default class Index extends Vue {
     //录音结束
     this.recorderManager.onStop(res => {
       uni.closeSocket();
-      console.log("录音结束回调=========");
     });
     //录音回调
     this.recorderManager.onFrameRecorded((res: any) => {
@@ -225,14 +228,6 @@ export default class Index extends Vue {
         }
       }
       params.data.status = status;
-
-      console.log(
-        "发送参数:",
-        status,
-        `isRecord:${this.isRecord}`,
-        `isAnimotion:${this.isAnimotion}`
-      );
-
       uni.sendSocketMessage({
         data: JSON.stringify(params),
         success: data => {
@@ -253,7 +248,6 @@ export default class Index extends Vue {
     });
     uni.onSocketOpen(data => {
       this.iatResult = [];
-      console.log("链接socket=============");
       if (this.isEnd) return;
       this.recorderManager.start(this.options);
     });
@@ -261,7 +255,6 @@ export default class Index extends Vue {
       console.log("socket服务连接失败，请重试", err);
     });
     uni.onSocketClose(data => {
-      console.log("关闭socket=========");
       if (this.isRecord) {
         this.recorderManager.stop();
         this.isAnimotion = false;
@@ -270,9 +263,8 @@ export default class Index extends Vue {
       }
     });
     uni.onSocketMessage((res: any) => {
-      console.log("收到服务器返回消息", res);
       let reponse = JSON.parse(res.data);
-      if (reponse.code === 0) {
+      if (reponse.code === 0 && this.isRecord) {
         let str = "";
         this.iatResult[reponse.data.result.sn] = reponse.data.result;
         if (reponse.data.result.pgs == "rpl") {
@@ -292,7 +284,6 @@ export default class Index extends Vue {
         this.searchWodr = str;
       }
       if (this.isLastFrame) {
-        console.log("正常结束========onRecordOver=======");
         this.onRecordOver(reponse.data.status === 2);
       }
     });
@@ -309,13 +300,9 @@ export default class Index extends Vue {
   }
   //开始录音
   async startRecord(e: any) {
-    console.log("startRecord", this.isRecord, this.isAnimotion, this.isEnd);
-
     if (this.isRecord || this.isAnimotion || this.isEnd) {
-      console.log("startRecord mover=========");
       return;
     }
-    console.log("开始动画=========");
     this.searchWodr = "";
     this.isEnd = false;
     this.items = [];
@@ -329,21 +316,15 @@ export default class Index extends Vue {
   }
   //结束录音
   endRecord() {
-    console.log(
-      "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@触发手指离开----------------"
-    );
     this.isEnd = true;
-    uni.vibrateShort();
-    console.log("放弃code=========");
+    uni.vibrateLong({});
     clearInterval(this.timer);
     this.isAnimotion = false;
     if (this.intervalTime <= 0.5) {
-      console.log("时间过短=========");
       uni.closeSocket();
     }
     setTimeout(() => {
       this.isEnd = false;
-      console.log("关闭音频=========");
       this.recorderManager.stop();
     }, 300); //延迟小段时间停止录音, 更好的体验
     this.isWaitBack = true;
@@ -408,11 +389,12 @@ export default class Index extends Vue {
     margin-top: 13upx;
     position: relative;
     .history {
-      height: 48upx;
-      width: 48upx;
+      padding: 20upx;
+      height: 88upx;
+      width: 88upx;
       position: absolute;
       margin: auto;
-      left: 48upx;
+      left: 28upx;
       top: 0;
       bottom: 0;
     }

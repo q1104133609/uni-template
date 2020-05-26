@@ -138,6 +138,7 @@ var render = function() {
       _vm.isfocus = false
       _vm.searchWodr = ""
       _vm.isRecord = false
+      _vm.items = []
     }
 
     _vm.e1 = function($event) {
@@ -346,17 +347,19 @@ var Index = /*#__PURE__*/function (_Vue) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 if (!this.searchWodr) {
-                  _context2.next = 7;
+                  _context2.next = 9;
                   break;
                 }
 
-                _context2.next = 3;
+                console.log("\u8BF7\u6C42\u53C2\u6570:".concat(this.searchWodr));
+                _context2.next = 4;
                 return (0, _request.get)("/api/wechat/app/search/index/query", {
                   searchParam: this.searchWodr
                 });
 
-              case 3:
+              case 4:
                 res = _context2.sent;
+                console.log("\u8FD4\u56DE\u503C:".concat(res));
 
                 if (res.success) {
                   if (res.rows.length === 1) {
@@ -379,13 +382,13 @@ var Index = /*#__PURE__*/function (_Vue) {
                   }
                 }
 
-                _context2.next = 8;
+                _context2.next = 10;
                 break;
 
-              case 7:
+              case 9:
                 this.isWaitBack = false;
 
-              case 8:
+              case 10:
               case "end":
                 return _context2.stop();
             }
@@ -407,10 +410,8 @@ var Index = /*#__PURE__*/function (_Vue) {
 
       //录音开始
       this.recorderManager.onStart(function () {
-        console.log("开始回调================");
         if (!_this4.isAnimotion) return;
-        uni.vibrateShort();
-        console.log("~~~~~~~~~~~~~~确定开始录音开始回调================");
+        uni.vibrateLong({});
         _this4.isRecord = true;
         _this4.intervalTime = 0;
         _this4.isLastFrame = false;
@@ -421,7 +422,6 @@ var Index = /*#__PURE__*/function (_Vue) {
 
       this.recorderManager.onStop(function (res) {
         uni.closeSocket();
-        console.log("录音结束回调=========");
       }); //录音回调
 
       this.recorderManager.onFrameRecorded(function (res) {
@@ -459,7 +459,6 @@ var Index = /*#__PURE__*/function (_Vue) {
         }
 
         params.data.status = status;
-        console.log("发送参数:", status, "isRecord:".concat(_this4.isRecord), "isAnimotion:".concat(_this4.isAnimotion));
         uni.sendSocketMessage({
           data: JSON.stringify(params),
           success: function success(data) {
@@ -480,7 +479,6 @@ var Index = /*#__PURE__*/function (_Vue) {
       });
       uni.onSocketOpen(function (data) {
         _this4.iatResult = [];
-        console.log("链接socket=============");
         if (_this4.isEnd) return;
 
         _this4.recorderManager.start(_this4.options);
@@ -489,8 +487,6 @@ var Index = /*#__PURE__*/function (_Vue) {
         console.log("socket服务连接失败，请重试", err);
       });
       uni.onSocketClose(function (data) {
-        console.log("关闭socket=========");
-
         if (_this4.isRecord) {
           _this4.recorderManager.stop();
 
@@ -501,10 +497,9 @@ var Index = /*#__PURE__*/function (_Vue) {
         }
       });
       uni.onSocketMessage(function (res) {
-        console.log("收到服务器返回消息", res);
         var reponse = JSON.parse(res.data);
 
-        if (reponse.code === 0) {
+        if (reponse.code === 0 && _this4.isRecord) {
           var str = "";
           _this4.iatResult[reponse.data.result.sn] = reponse.data.result;
 
@@ -528,8 +523,6 @@ var Index = /*#__PURE__*/function (_Vue) {
         }
 
         if (_this4.isLastFrame) {
-          console.log("正常结束========onRecordOver=======");
-
           _this4.onRecordOver(reponse.data.status === 2);
         }
       });
@@ -556,18 +549,14 @@ var Index = /*#__PURE__*/function (_Vue) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                console.log("startRecord", this.isRecord, this.isAnimotion, this.isEnd);
-
                 if (!(this.isRecord || this.isAnimotion || this.isEnd)) {
-                  _context3.next = 4;
+                  _context3.next = 2;
                   break;
                 }
 
-                console.log("startRecord mover=========");
                 return _context3.abrupt("return");
 
-              case 4:
-                console.log("开始动画=========");
+              case 2:
                 this.searchWodr = "";
                 this.isEnd = false;
                 this.items = [];
@@ -582,7 +571,7 @@ var Index = /*#__PURE__*/function (_Vue) {
                   }
                 }, 300);
 
-              case 10:
+              case 7:
               case "end":
                 return _context3.stop();
             }
@@ -602,21 +591,17 @@ var Index = /*#__PURE__*/function (_Vue) {
     value: function endRecord() {
       var _this6 = this;
 
-      console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@触发手指离开----------------");
       this.isEnd = true;
-      uni.vibrateShort();
-      console.log("放弃code=========");
+      uni.vibrateLong({});
       clearInterval(this.timer);
       this.isAnimotion = false;
 
       if (this.intervalTime <= 0.5) {
-        console.log("时间过短=========");
         uni.closeSocket();
       }
 
       setTimeout(function () {
         _this6.isEnd = false;
-        console.log("关闭音频=========");
 
         _this6.recorderManager.stop();
       }, 300); //延迟小段时间停止录音, 更好的体验
