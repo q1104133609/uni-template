@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 18:04:23
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-27 10:10:03
+ * @LastEditTime: 2020-05-27 21:03:58
  -->
 <!--  -->
 <template>
@@ -208,9 +208,9 @@ export default class Rocode extends Vue {
 <style lang='scss' scoped>
 /* pages/myRecode/myRecode.wxss */
 .myccc {
-  width: 196rpx;
+  width: 276rpx;
   height: 156rpx;
-  padding:0rpx 20rpx;
+  padding:0rpx 60rpx;
   text-align: center;
 }
 .recode {

@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-04-13 13:28:51
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-26 15:25:42
+ * @LastEditTime: 2020-05-27 18:45:39
  */
 
 import Vue from 'vue';
@@ -14,23 +14,19 @@ import store from './store';
 //把vuex定义成全局组件
 Vue.prototype.$store = store;
 Vue.config.productionTip = false;
-import "@/assets/colorui/main.css";
-import "@/assets/colorui/icon.css";
+import '@/assets/colorui/main.css';
+import '@/assets/colorui/icon.css';
 const app = new Vue({
+	store,
 	...{
 		mpType: 'app',
-		globalData: {
-			StatusBar: 0,
-			CustomBar: 0
-		},
+		globalData: {},
 		onLaunch() {
 			let info = uni.getSystemInfoSync();
 			let custom = uni.getMenuButtonBoundingClientRect();
-            let that = this as any;
-            this.$store.commit('setStatusBar',info.statusBarHeight)
-            this.$store.commit('setCustomBar',custom.bottom!! + custom.top!! - info.statusBarHeight!!)
-			that.globalData.StatusBar = info.statusBarHeight;
-			that.globalData.CustomBar = custom.bottom!! + custom.top!! - info.statusBarHeight!!;
+			console.log(info);
+			this.$store.dispatch('setStatusBarAction', info.statusBarHeight || 44);
+			this.$store.dispatch('setCustomBarAction', custom.bottom!! + custom.top!! - info.statusBarHeight!! || 84);
 		},
 		onShow() {
 			console.log('App Show');
@@ -38,8 +34,7 @@ const app = new Vue({
 		onHide() {
 			console.log('App Hide');
 		}
-	},
-	store
+	}
 });
 
 app.$mount();

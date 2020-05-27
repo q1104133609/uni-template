@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-27 10:04:52
+ * @LastEditTime: 2020-05-27 21:04:08
  -->
 <!--  -->
 <template>
@@ -112,9 +112,11 @@ export default class Index extends Vue {
   firstSend = true; //是否第一次
   isfocus = false; //是否有焦点
   isWaitBack = false;
+  isSocket = false;
   isAnimotion = false;
+  isWait: any = null; //等待返回
   get height() {
-    return `calc(100vh - ${this.CustomBar}px - 320rpx)`;
+    return `calc(100vh - ${this.CustomBar}px - 280rpx)`;
   }
   searchWodr = ""; //搜索内容
   options = {
@@ -123,7 +125,7 @@ export default class Index extends Vue {
     numberOfChannels: 1,
     encodeBitRate: 48000,
     format: "mp3",
-    frameSize: 3
+    frameSize: 6
   };
   queryCommonTips: any[] = [];
   xfInfo: any = {};
@@ -194,7 +196,7 @@ export default class Index extends Vue {
     });
     //录音结束
     this.recorderManager.onStop(res => {
-      uni.closeSocket();
+      // uni.closeSocket();
     });
     //录音回调
     this.recorderManager.onFrameRecorded((res: any) => {
@@ -246,15 +248,19 @@ export default class Index extends Vue {
       });
     });
     uni.onSocketOpen(data => {
+      this.isSocket = true;
       this.iatResult = [];
       if (this.isEnd) return;
       this.recorderManager.start(this.options);
     });
     uni.onSocketError(err => {
+      this.isSocket = false;
       console.log("socket服务连接失败，请重试", err);
     });
     uni.onSocketClose(data => {
+      this.isSocket = false;
       if (this.isRecord) {
+        console.log("-----socket返回");
         this.recorderManager.stop();
         this.isAnimotion = false;
         this.isRecord = false;
@@ -282,8 +288,10 @@ export default class Index extends Vue {
         });
         this.searchWodr = str;
       }
-      if (this.isLastFrame) {
+      if (reponse && reponse.data && reponse.data.status === 2) {
+        console.log("-----结束返回状态2");
         this.onRecordOver(reponse.data.status === 2);
+        this.isWait && this.onWaitBack(reponse.data.status === 2);
       }
     });
   }
@@ -291,18 +299,43 @@ export default class Index extends Vue {
   //录音结束
   onRecordOver(isNoamlOver: boolean) {
     if (this.isRecord) {
-      try {
-        if (!isNoamlOver) uni.closeSocket();
-      } catch (error) {
-      }
       this.isAnimotion = false;
       this.isRecord = false;
+      try {
+        if (!isNoamlOver) this.isSocket && uni.closeSocket();
+        else this.recorderManager.stop();
+      } catch (error) {}
       this.getData();
+    }
+  }
+
+  onWaitBack(isNoamlOver: boolean) {
+    if (isNoamlOver || !this.isSocket) {
+      return;
+    }
+    if (this.isWait != null) {
+      clearTimeout(this.isWait);
+      this.isWait = null;
+      try {
+        this.isSocket && uni.closeSocket();
+      } catch (error) {}
+
+      console.log("被动倒计时结束");
+    } else {
+      console.log("开始倒计时");
+      this.isWait = setTimeout(() => {
+        console.log("主动倒计时结束");
+        clearTimeout(this.isWait);
+        this.isWait = null;
+        try {
+          this.isSocket && uni.closeSocket();
+        } catch (error) {}
+      }, 1000);
     }
   }
   //开始录音
   async startRecord(e: any) {
-    if (this.isRecord || this.isAnimotion || this.isEnd) {
+    if (this.isRecord || this.isAnimotion || this.isEnd || this.isWait) {
       return;
     }
     uni.vibrateLong({
@@ -326,6 +359,7 @@ export default class Index extends Vue {
   }
   //结束录音
   endRecord() {
+    if (this.isWait) return;
     this.isEnd = true;
     // uni.vibrateLong({
     //   success: () => {
@@ -339,13 +373,14 @@ export default class Index extends Vue {
     this.isAnimotion = false;
     if (this.intervalTime <= 0.5) {
       try {
-        uni.closeSocket();
+        this.isSocket && uni.closeSocket();
       } catch (error) {}
     }
     setTimeout(() => {
       this.isEnd = false;
       try {
         this.recorderManager.stop();
+        this.onWaitBack(false);
       } catch (error) {}
     }, 300); //延迟小段时间停止录音, 更好的体验
     this.isWaitBack = true;

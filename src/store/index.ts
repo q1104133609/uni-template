@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-26 14:08:06
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-26 15:25:56
+ * @LastEditTime: 2020-05-27 13:18:00
  */
 
 import Vue from 'vue';
@@ -12,26 +12,30 @@ import Vuex from 'vuex';
 Vue.use(Vuex);
 const store = new Vuex.Store({
 	state: {
-		StatusBar: 0,
-		CustomBar: 0
+		StatusBar: 20,
+		CustomBar: 60
 	},
 	mutations: {
 		setStatusBar(state, StatusBar) {
+			console.log('StatusBar1', StatusBar);
 			state.StatusBar = StatusBar;
-        },
-        setCustomBar(state, CustomBar) {
+		},
+		setCustomBar(state, CustomBar) {
+			console.log('CustomBar1', CustomBar);
 			state.CustomBar = CustomBar;
 		}
 	},
 	actions: {
-        setStatusBar({commit,state}, StatusBar){
-            commit("setStatusBar", StatusBar);
-        },
-        setCustomBar({commit,state}, CustomBar){
-            // 跟后台打交道
-            // 调用mutaions里面的方法
-            commit("setCustomBar", CustomBar);
-        },
-    }
+		setStatusBarAction({ commit, state }, StatusBar) {
+			console.log('StatusBar', StatusBar);
+			commit('setStatusBar', StatusBar);
+		},
+		setCustomBarAction({ commit, state }, CustomBar) {
+			// 跟后台打交道
+			// 调用mutaions里面的方法
+			console.log('CustomBar', CustomBar);
+			commit('setCustomBar', CustomBar);
+		}
+	}
 });
 export default store;
