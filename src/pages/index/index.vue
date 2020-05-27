@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-26 18:00:12
+ * @LastEditTime: 2020-05-27 10:04:52
  -->
 <!--  -->
 <template>
@@ -114,7 +114,7 @@ export default class Index extends Vue {
   isWaitBack = false;
   isAnimotion = false;
   get height() {
-    return `calc(100vh - ${this.CustomBar + 320}rpx)`;
+    return `calc(100vh - ${this.CustomBar}px - 320rpx)`;
   }
   searchWodr = ""; //搜索内容
   options = {
@@ -291,7 +291,10 @@ export default class Index extends Vue {
   //录音结束
   onRecordOver(isNoamlOver: boolean) {
     if (this.isRecord) {
-      if (!isNoamlOver) uni.closeSocket();
+      try {
+        if (!isNoamlOver) uni.closeSocket();
+      } catch (error) {
+      }
       this.isAnimotion = false;
       this.isRecord = false;
       this.getData();
