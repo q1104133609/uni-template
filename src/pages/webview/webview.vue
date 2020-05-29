@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 23:40:09
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-26 15:29:17
+ * @LastEditTime: 2020-05-28 20:26:21
  -->
 <!--  -->
 <template>
@@ -32,17 +32,34 @@ export default class WebView extends Vue {
   title = getApp().globalData!!.title;
   userName = getApp().globalData!!.userName;
   myUrl = "";
-  created() {
+ async onLoad(data: any) {
+    console.log("onload", data);
+    if (!data && !data.url) {
+      this.url = data.url;
+      this.viewAppId = data.viewAppId;
+      this.title = data.title;
+      this.userName = data.userName;
+    }
     uni.login({
       success: res => {
         this.myUrl = `${this.url}&jsCode=${res.code}&userName=${this.userName}`;
       }
     });
-  }
-  mounted() {
     if (this.viewAppId)
       post("/api/wechat/view/history/insert", { viewAppId: this.viewAppId });
   }
+
+  // onShareAppMessage(res: any) {
+  //   return {
+  //     title: "数字旭辉",
+  //     path: `/pages/webview/webview?title=${
+  //       getApp().globalData!!.title
+  //     }&userName=${getApp().globalData!!.userName}
+  //     &viewAppId=${getApp().globalData!!.viewAppId}&url=${
+  //       getApp().globalData!!.url
+  //     }`
+  //   };
+  // }
 }
 </script>
 <style lang='scss' scoped>

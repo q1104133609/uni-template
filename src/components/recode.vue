@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 18:04:23
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-27 21:03:58
+ * @LastEditTime: 2020-05-28 19:33:23
  -->
 <!--  -->
 <template>
@@ -18,9 +18,13 @@
       <view class="ripple" :animation="spreakingAnimation1" v-if="isRecord"></view>
       <view class="ripple" :animation="spreakingAnimation2" v-if="isRecord">></view>
       <view class="ripple" :animation="spreakingAnimation3" v-if="isRecord">></view>
+      <view class="loading_view" v-if="showLoading">
+        <div class="loader-15"></div>
+      </view>
       <image
         :src="isRecord?'../static/images/video1.png':'../static/images/video.png'"
         style="width:100%;height:100%;"
+         v-if="!showLoading"
       />
     </view>
   </view>
@@ -40,6 +44,10 @@ export default class Rocode extends Vue {
     default: false
   })
   private isRecord!: boolean;
+   @Prop({
+    default: false
+  })
+  private showLoading!: boolean;
   onReady() {
     this.animation1 = uni.createAnimation({
       duration: 1000,
@@ -210,7 +218,7 @@ export default class Rocode extends Vue {
 .myccc {
   width: 276rpx;
   height: 156rpx;
-  padding:0rpx 60rpx;
+  padding: 0rpx 60rpx;
   text-align: center;
 }
 .recode {
@@ -229,5 +237,72 @@ export default class Rocode extends Vue {
   border: 4upx dotted #4ef2ff;
   width: 100%;
   height: 100%;
+}
+.loading_view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  border:2upx solid #fff;
+  border-radius: 100%;
+  margin: 10upx;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.loader-15 {
+  background: #fff;
+  position: relative;
+  -webkit-animation: loader-15 1s ease-in-out infinite;
+  animation: loader-15 1s ease-in-out infinite;
+  -webkit-animation-delay: 0.4s;
+  animation-delay: 0.4s;
+  width: 0.25em;
+  height: 1em;
+ 
+}
+.loader-15:after,
+.loader-15:before {
+  content: "";
+  position: absolute;
+  width: inherit;
+  height: inherit;
+  background: #fff;
+  -webkit-animation: inherit;
+  animation: inherit;
+}
+.loader-15:before {
+  right: 0.5em;
+  -webkit-animation-delay: 0.2s;
+  animation-delay: 0.2s;
+}
+.loader-15:after {
+  left: 0.5em;
+  -webkit-animation-delay: 0.6s;
+  animation-delay: 0.6s;
+}
+@-webkit-keyframes loader-15 {
+  0%,
+  100% {
+    box-shadow: 0 0 0 #fff, 0 0 0 #fff;
+  }
+  50% {
+    box-shadow: 0 -0.25em 0 #fff, 0 0.25em 0 #fff;
+  }
+}
+@keyframes loader-15 {
+  0%,
+  100% {
+    box-shadow: 0 0 0 #fff, 0 0 0 #fff;
+  }
+  50% {
+    box-shadow: 0 -0.25em 0 #fff, 0 0.25em 0 #fff;
+  }
 }
 </style>

@@ -4,13 +4,14 @@
  * @Author: 小白
  * @Date: 2020-05-13 11:04:54
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-20 10:31:03
+ * @LastEditTime: 2020-05-28 19:24:49
  -->
 <!--  -->
 <template>
   <mycontent title="登录" :isback="true">
-    <div class="row_center muitem" style="margin-top:100upx">
-      <div>数字旭辉登录</div>
+    <div class="top_title" v-show="isNoAccess">系统未找到您的号码!</div>
+    <div class="row_center muitem" style="margin-top:24upx">
+      <div>请使用数字旭辉统一账号登录</div>
       <div
         style="flex:1;font-size:20upx;
 font-family:PingFangSC-Regular,PingFang SC;
@@ -53,6 +54,10 @@ export default class extends Vue {
   loginCode: string = "";
   user = "";
   pwd = "";
+  isNoAccess = false;
+  onLoad({ isNoAccess = false }: any) {
+    this.isNoAccess = isNoAccess;
+  }
   async register() {
     if (!this.user) {
       uni.showToast({
@@ -85,12 +90,19 @@ export default class extends Vue {
     }
   }
   login() {
-    uni.navigateBack()
+    uni.navigateBack();
   }
 }
 </script>
 <style lang='scss' scoped>
-/* @import url(); 引入css类 */
+.top_title {
+  font-size: 58upx;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 1);
+  line-height: 88upx;
+  margin-top: 20upx;
+}
 .muitem {
   width: 100%;
   padding: 32upx 0upx;
@@ -101,13 +113,13 @@ export default class extends Vue {
 .login {
   width: 679upx;
   height: 80upx;
-  background: #1AAD19;
+  background: #1aad19;
   border-radius: 40upx;
   text-align: center;
   font-size: 28upx;
   font-family: PingFangSC-Regular, PingFang SC;
   font-weight: 400;
-  color: #FFFFFF;
+  color: #ffffff;
   margin-top: 30upx;
   line-height: 80upx;
 }

@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 11:04:54
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-20 10:37:06
+ * @LastEditTime: 2020-05-28 19:24:21
  -->
 <!--  -->
 <template>
@@ -48,7 +48,7 @@ export default class extends Vue {
         });
       } else {
         uni.navigateTo({
-          url: "/pages/register/register"
+          url: "/pages/register/register?isNoAccess=true"
         });
       }
     } else {

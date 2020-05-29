@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-27 21:04:08
+ * @LastEditTime: 2020-05-28 20:26:35
  -->
 <!--  -->
 <template>
@@ -85,7 +85,12 @@
       <div class="gradient-text" v-if="!isRecord&&!searchWodr&&!isAnimotion">轻轻按住，说出你想搜索的内容</div>
       <view class="row_center video_view">
         <image src="../../static/images/history.png" class="history" @click.stop="toHistory" />
-        <Recode :isRecord="isAnimotion" @startRecord="startRecord" @endRecord="endRecord" />
+        <Recode
+          :isRecord="isAnimotion"
+          @startRecord="startRecord"
+          @endRecord="endRecord"
+          :showLoading="isWait"
+        />
       </view>
     </view>
   </mycontent>
@@ -309,6 +314,13 @@ export default class Index extends Vue {
     }
   }
 
+  // onShareAppMessage(res: any) {
+  //   return {
+  //     title: "微信小程序测试分享",
+  //     path: "/pages/index/index"
+  //   };
+  // }
+
   onWaitBack(isNoamlOver: boolean) {
     if (isNoamlOver || !this.isSocket) {
       return;
@@ -382,7 +394,7 @@ export default class Index extends Vue {
         this.recorderManager.stop();
         this.onWaitBack(false);
       } catch (error) {}
-    }, 300); //延迟小段时间停止录音, 更好的体验
+    }, 200); //延迟小段时间停止录音, 更好的体验
     this.isWaitBack = true;
     this.intervalTime = 0;
   }
