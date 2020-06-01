@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 11:04:54
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-01 10:44:44
+ * @LastEditTime: 2020-06-01 19:21:24
  -->
 <!--  -->
 <template>
@@ -22,8 +22,11 @@ export default class extends Vue {
   async onLoad(data: any) {
     let url = "";
     if (data && data.url) {
-      url = data.url;
+      url = decodeURIComponent(data.url);
     }
+    this.login(url);
+  }
+  login(url:string) {
     uni.login({
       success: async res => {
         let { access_token } = await post(
@@ -39,6 +42,9 @@ export default class extends Vue {
         uni.reLaunch({
           url: url || "/pages/index/index"
         });
+      },
+      fail: () => {
+        this.login(url)
       }
     });
   }

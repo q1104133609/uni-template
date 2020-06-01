@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 23:40:09
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-01 10:54:18
+ * @LastEditTime: 2020-06-01 19:30:19
  -->
 <!--  -->
 <template>
@@ -32,17 +32,21 @@ export default class WebView extends Vue {
   title = getApp().globalData!!.title;
   userName = getApp().globalData!!.userName;
   myUrl = "";
+  from = "common";
   async onLoad(data: any) {
-    console.log("onload", data);
-    if (!data && !data.url) {
-      this.url = data.url;
-      this.viewAppId = data.viewAppId;
-      this.title = data.title;
-      this.userName = data.userName;
+    if (data && data.params) {
+      console.log("onload", JSON.parse(decodeURIComponent(data.params)));
+      let params = JSON.parse(decodeURIComponent(data.params));
+      let res = await get("/api/wechat/init/info/query");
+      this.url = params.url;
+      this.viewAppId = params.viewAppId;
+      this.title = params.title;
+      this.userName = res.employeeInfo.userName;
+      this.from = "share";
     }
     uni.login({
       success: res => {
-        this.myUrl = `${this.url}&jsCode=${res.code}&userName=${this.userName}`;
+        this.myUrl = `${this.url}&jsCode=${res.code}&userName=${this.userName}&from=${this.from}`;
       }
     });
     if (this.viewAppId)
@@ -50,15 +54,19 @@ export default class WebView extends Vue {
   }
 
   onShareAppMessage(res: any) {
+    let jumpParams = {
+      title: getApp().globalData!!.title,
+      viewAppId: getApp().globalData!!.viewAppId,
+      url: getApp().globalData!!.url
+    };
     return {
-      title: "数字旭辉",
+      title: this.title,
       imageUrl: "../../static/images/share.png",
-      path: `/pages/start/start?url=/pages/webview/webview?title=${
-        getApp().globalData!!.title
-      }&userName=${getApp().globalData!!.userName}
-      &viewAppId=${getApp().globalData!!.viewAppId}&url=${
-        getApp().globalData!!.url
-      }`
+      path: `/pages/start/start?url=${encodeURIComponent(
+        `/pages/webview/webview?params=${encodeURIComponent(
+          JSON.stringify(jumpParams)
+        )}`
+      )}`
     };
   }
 }

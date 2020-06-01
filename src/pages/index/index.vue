@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-01 18:37:25
+ * @LastEditTime: 2020-06-01 19:04:01
  -->
 <!--  -->
 <template>
@@ -432,7 +432,7 @@ export default class Index extends Vue {
     return {
       title: "数字旭辉",
       imageUrl: "../../static/images/share.png",
-      path: `/pages/start/start?url=/pages/index/index`
+      path: `/pages/start/start`
     };
   }
 }

@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-04-13 13:28:51
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-01 18:06:20
+ * @LastEditTime: 2020-06-01 18:46:16
  */
 
 import Vue from 'vue';
@@ -23,13 +23,17 @@ const app = new Vue({
 		globalData: {},
 		onLaunch() {
 			let info = uni.getSystemInfoSync();
-			let custom = uni.getMenuButtonBoundingClientRect();
-			console.log(info);
-			this.$store.dispatch('setStatusBarAction', info.statusBarHeight || 44);
-			this.$store.dispatch(
-				'setCustomBarAction',
-				info.statusBarHeight ? custom.bottom!! + custom.top!! - info.statusBarHeight!! : 84
-			);
+			if ((info.model || '').indexOf('iPhone XS Max') != -1) {
+				this.$store.dispatch('setStatusBarAction', 44);
+				this.$store.dispatch('setCustomBarAction', 84);
+			} else {
+				let custom = uni.getMenuButtonBoundingClientRect();
+				this.$store.dispatch('setStatusBarAction', info.statusBarHeight || 44);
+				this.$store.dispatch(
+					'setCustomBarAction',
+					info.statusBarHeight ? custom.bottom!! + custom.top!! - info.statusBarHeight!! : 84
+				);
+			}
 		},
 		onShow() {
 			console.log('App Show');
