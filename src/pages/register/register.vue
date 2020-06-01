@@ -95,6 +95,7 @@ export default class extends Vue {
   onShareAppMessage(res: any) {
     return {
       title: "数字旭辉",
+      imageUrl: "../../static/images/share.png",
       path: `/pages/start/start`
     };
   }

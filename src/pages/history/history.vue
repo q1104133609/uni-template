@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-12 22:52:46
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-01 10:45:13
+ * @LastEditTime: 2020-06-01 18:30:52
  -->
 <!--  -->
 <template>
@@ -47,9 +47,10 @@ export default class extends Vue {
   }
   mounted() {}
   onShareAppMessage(res: any) {
-     return {
+    return {
       title: "数字旭辉",
-      path: `/pages/start/start?url=/pages/index/index`
+      path: `/pages/start/start?url=/pages/index/index`,
+      imageUrl: "../../static/images/share.png"
     };
   }
 }

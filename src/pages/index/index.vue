@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-01 10:45:03
+ * @LastEditTime: 2020-06-01 18:37:25
  -->
 <!--  -->
 <template>
@@ -13,7 +13,7 @@
     :isback="searchWodr"
     @back="isfocus=false;searchWodr='';isRecord = false;items = []"
   >
-    <scroll-view scroll-y :style="{'height':height}">
+    <scroll-view scroll-y :style="{'height':`calc(100vh - ${this.CustomBar||84}px - 280rpx)`}">
       <view v-if="searchWodr">
         <textarea
           v-model="searchWodr"
@@ -120,9 +120,6 @@ export default class Index extends Vue {
   isSocket = false;
   isAnimotion = false;
   isWait: any = null; //等待返回
-  get height() {
-    return `calc(100vh - ${this.CustomBar}px - 280rpx)`;
-  }
   searchWodr = ""; //搜索内容
   options = {
     duration: 1000 * 60,
@@ -141,17 +138,16 @@ export default class Index extends Vue {
   isRecord = false;
   isEnd = false;
   iatResult: any[] = [];
-
-  async created() {
+  async onShow() {
+    console.log("onShow");
+    if (this.xfInfo.apiSecret) return;
     get("/api/public/wechat/tip/content/config/queryCommonTips").then(v => {
       this.queryCommonTips = v.rows;
     });
-    if (getAuth()) {
-      let res = await get("/api/wechat/init/info/query");
-      this.employeeInfo = res.employeeInfo;
-      this.xfInfo = res.xfyunAuthConfig;
-      getApp().globalData!!.userName = res.employeeInfo.userName;
-    }
+    let res = await get("/api/wechat/init/info/query");
+    this.employeeInfo = res.employeeInfo;
+    this.xfInfo = res.xfyunAuthConfig;
+    getApp().globalData!!.userName = res.employeeInfo.userName;
   }
 
   //搜索数据
@@ -435,6 +431,7 @@ export default class Index extends Vue {
   onShareAppMessage(res: any) {
     return {
       title: "数字旭辉",
+      imageUrl: "../../static/images/share.png",
       path: `/pages/start/start?url=/pages/index/index`
     };
   }

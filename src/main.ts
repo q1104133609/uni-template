@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-04-13 13:28:51
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-27 18:45:39
+ * @LastEditTime: 2020-06-01 18:06:20
  */
 
 import Vue from 'vue';
@@ -26,7 +26,10 @@ const app = new Vue({
 			let custom = uni.getMenuButtonBoundingClientRect();
 			console.log(info);
 			this.$store.dispatch('setStatusBarAction', info.statusBarHeight || 44);
-			this.$store.dispatch('setCustomBarAction', custom.bottom!! + custom.top!! - info.statusBarHeight!! || 84);
+			this.$store.dispatch(
+				'setCustomBarAction',
+				info.statusBarHeight ? custom.bottom!! + custom.top!! - info.statusBarHeight!! : 84
+			);
 		},
 		onShow() {
 			console.log('App Show');

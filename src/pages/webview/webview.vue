@@ -32,7 +32,7 @@ export default class WebView extends Vue {
   title = getApp().globalData!!.title;
   userName = getApp().globalData!!.userName;
   myUrl = "";
- async onLoad(data: any) {
+  async onLoad(data: any) {
     console.log("onload", data);
     if (!data && !data.url) {
       this.url = data.url;
@@ -50,8 +50,9 @@ export default class WebView extends Vue {
   }
 
   onShareAppMessage(res: any) {
-     return {
+    return {
       title: "数字旭辉",
+      imageUrl: "../../static/images/share.png",
       path: `/pages/start/start?url=/pages/webview/webview?title=${
         getApp().globalData!!.title
       }&userName=${getApp().globalData!!.userName}

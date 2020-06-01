@@ -3,7 +3,7 @@
  * @Author: 小白
  * @Date: 2019-09-17 02:03:28
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-26 15:27:23
+ * @LastEditTime: 2020-06-01 18:07:32
  -->
 <template>
   <view>
@@ -44,7 +44,8 @@ export default class CuCustom extends Vue {
   })
   private bgColor!: string;
   get style() {
-    var style = `height:${this.CustomBar}px;padding-top:${this.StatusBar}px;`;
+    var style = `height:${this.CustomBar || 84}px;padding-top:${this
+      .StatusBar || 44}px;`;
     if (this.bgColor) {
       style = `${style}background:${this.bgColor}`;
     }
