@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 11:04:54
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-15 19:13:05
+ * @LastEditTime: 2020-06-01 10:44:44
  -->
 <!--  -->
 <template>
@@ -19,7 +19,11 @@ import { post } from "../../plugins/request";
 import { setAuth } from "../../utils/util";
 @Component({ components: { mycontent, myBlock }, name: "Logn" })
 export default class extends Vue {
-  created() {
+  async onLoad(data: any) {
+    let url = "";
+    if (data && data.url) {
+      url = data.url;
+    }
     uni.login({
       success: async res => {
         let { access_token } = await post(
@@ -33,10 +37,16 @@ export default class extends Vue {
         }
         setAuth(access_token || "");
         uni.reLaunch({
-          url: "/pages/index/index"
+          url: url || "/pages/index/index"
         });
       }
     });
+  }
+  onShareAppMessage(res: any) {
+    return {
+      title: "数字旭辉",
+      path: `/pages/start/start`
+    };
   }
 }
 </script>

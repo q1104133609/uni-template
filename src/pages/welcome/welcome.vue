@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 11:04:54
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-20 10:25:47
+ * @LastEditTime: 2020-06-01 10:19:49
  -->
 <!--  -->
 <template>
@@ -53,6 +53,12 @@ export default class extends Vue {
     uni.navigateTo({
       url: "/pages/login/login"
     });
+  }
+  onShareAppMessage(res: any) {
+    return {
+      title: "数字旭辉",
+      path: `/pages/start/start`
+    };
   }
 }
 </script>

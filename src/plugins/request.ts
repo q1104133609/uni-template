@@ -4,7 +4,7 @@ import { setAuth, getAPPInfo } from './../utils/util';
  * @Author: 小白
  * @Date: 2020-02-09 15:16:22
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-16 10:22:54
+ * @LastEditTime: 2020-06-01 10:02:35
  */
 import { getAuth } from '@/utils/util';
 import { host } from '@/commont/constant';
@@ -33,6 +33,13 @@ export const BaseRequest = (
 			header,
 			success: (res: any) => {
 				uni.hideLoading();
+				if(res.statusCode === 401){
+					uni.reLaunch({
+						url:"/pages/start/start"
+					})
+					reject(res)
+					return
+				}
 				!res.data.success &&
 					res.data.message &&
 					uni.showToast({

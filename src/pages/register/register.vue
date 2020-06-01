@@ -92,6 +92,12 @@ export default class extends Vue {
   login() {
     uni.navigateBack();
   }
+  onShareAppMessage(res: any) {
+    return {
+      title: "数字旭辉",
+      path: `/pages/start/start`
+    };
+  }
 }
 </script>
 <style lang='scss' scoped>

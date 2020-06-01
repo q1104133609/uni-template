@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-28 20:26:35
+ * @LastEditTime: 2020-06-01 10:45:03
  -->
 <!--  -->
 <template>
@@ -431,6 +431,12 @@ export default class Index extends Vue {
     uni.navigateTo({
       url: "/pages/history/history"
     });
+  }
+  onShareAppMessage(res: any) {
+    return {
+      title: "数字旭辉",
+      path: `/pages/start/start?url=/pages/index/index`
+    };
   }
 }
 </script>

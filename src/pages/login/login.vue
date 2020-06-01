@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 11:04:54
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-28 19:24:21
+ * @LastEditTime: 2020-06-01 10:19:40
  -->
 <!--  -->
 <template>
@@ -14,7 +14,9 @@
       open-type="getPhoneNumber"
       @getphonenumber="getPhoneNumber"
       class="login"
-    ><image src="../../static/images/weixin.png" style="width:37upx;height:32upx"/>微信登录</button>
+    >
+      <image src="../../static/images/weixin.png" style="width:37upx;height:32upx" />微信登录
+    </button>
   </mycontent>
 </template>
 
@@ -57,6 +59,12 @@ export default class extends Vue {
       });
     }
   }
+  onShareAppMessage(res: any) {
+    return {
+      title: "数字旭辉",
+      path: `/pages/start/start`
+    };
+  }
 }
 </script>
 <style lang='scss' scoped>
@@ -64,14 +72,14 @@ export default class extends Vue {
 .login {
   width: 670upx;
   height: 94upx;
-  background: #1AAD19;
+  background: #1aad19;
   border-radius: 10upx;
   border: 2upx solid rgba(5, 5, 5, 0.08);
   text-align: center;
   font-size: 36upx;
   font-family: PingFangSC-Regular, PingFang SC;
   font-weight: 400;
-  color: #FFFFFF;
+  color: #ffffff;
   margin-top: 100upx;
   line-height: 94upx;
   border: none;
@@ -79,7 +87,7 @@ export default class extends Vue {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  image{
+  image {
     margin-right: 18upx;
   }
 }
