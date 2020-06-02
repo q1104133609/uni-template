@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-01 19:04:01
+ * @LastEditTime: 2020-06-02 15:56:10
  -->
 <!--  -->
 <template>
@@ -430,7 +430,7 @@ export default class Index extends Vue {
   }
   onShareAppMessage(res: any) {
     return {
-      title: "数字旭辉",
+      title: "邀请您查看数字旭辉",
       imageUrl: "../../static/images/share.png",
       path: `/pages/start/start`
     };

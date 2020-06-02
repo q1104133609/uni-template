@@ -48,7 +48,7 @@ export default class extends Vue {
   mounted() {}
   onShareAppMessage(res: any) {
     return {
-      title: "数字旭辉",
+      title: "邀请您查看数字旭辉",
       path: `/pages/start/start`,
       imageUrl: "../../static/images/share.png"
     };

@@ -3,7 +3,7 @@
  * @Author: 小白
  * @Date: 2019-09-17 02:03:28
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-01 18:07:32
+ * @LastEditTime: 2020-06-02 08:45:22
  -->
 <template>
   <view>
@@ -14,7 +14,7 @@
           <slot name="backText"></slot>
         </view>
         <slot name="left"></slot>
-        <view class="content" :style="[{top:StatusBar + 'px'}]">
+        <view class="content" :style="[{top:(StatusBar||44) + 'px'}]">
           <slot name="content"></slot>
         </view>
         <slot name="right"></slot>

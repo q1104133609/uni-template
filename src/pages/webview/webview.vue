@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 23:40:09
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-01 19:30:19
+ * @LastEditTime: 2020-06-02 20:14:07
  -->
 <!--  -->
 <template>
@@ -33,6 +33,7 @@ export default class WebView extends Vue {
   userName = getApp().globalData!!.userName;
   myUrl = "";
   from = "common";
+
   async onLoad(data: any) {
     if (data && data.params) {
       console.log("onload", JSON.parse(decodeURIComponent(data.params)));
@@ -54,13 +55,22 @@ export default class WebView extends Vue {
   }
 
   onShareAppMessage(res: any) {
+    let urlList = res.webViewUrl.split("?");
+    let url =
+      urlList[0] +
+      (urlList.length > 1 ? "?" + urlList[1].split("&jsCode")[0] : "");
+    console.log("-----", url);
     let jumpParams = {
       title: getApp().globalData!!.title,
       viewAppId: getApp().globalData!!.viewAppId,
-      url: getApp().globalData!!.url
+      url
     };
+
+    uni.showToast({
+      title: url
+    });
     return {
-      title: this.title,
+      title: `邀请您查看${this.title}`,
       imageUrl: "../../static/images/share.png",
       path: `/pages/start/start?url=${encodeURIComponent(
         `/pages/webview/webview?params=${encodeURIComponent(
