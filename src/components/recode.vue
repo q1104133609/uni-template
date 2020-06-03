@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 18:04:23
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-28 19:33:23
+ * @LastEditTime: 2020-06-03 14:29:25
  -->
 <!--  -->
 <template>
@@ -85,7 +85,7 @@ export default class Rocode extends Vue {
               scope: "scope.record",
               success() {
                 console.log("录音授权成功");
-                resolve(true);
+                resolve(false);
                 // 用户已经同意小程序使用录音功能
               },
               fail() {
@@ -113,7 +113,7 @@ export default class Rocode extends Vue {
                           } else {
                             //第二次才成功授权
                             console.log("设置录音授权成功");
-                            resolve(true);
+                            resolve(false);
                           }
                         },
 
