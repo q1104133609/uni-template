@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 18:04:23
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-03 15:15:39
+ * @LastEditTime: 2020-06-03 17:39:09
  -->
 <!--  -->
 <template>
@@ -68,7 +68,24 @@ export default class Rocode extends Vue {
       this.speaking();
     }
   }
-
+  created() {
+    uni.getSetting({
+      success(res) {
+        if (res.authSetting["scope.record"] === undefined) {
+          // //调取小程序新版授权页面
+          uni.authorize({
+            scope: "scope.record",
+            success() {
+              console.log("录音授权成功");
+            },
+            fail() {
+              console.log("第一次录音授权失败");
+            }
+          });
+        }
+      }
+    });
+  }
   async touchstart() {
     if (await this.checkPrimisse()) {
       this.$emit("startRecord");
@@ -79,10 +96,10 @@ export default class Rocode extends Vue {
     return new Promise(resolve => {
       uni.getSetting({
         success(res) {
-          console.log(res.authSetting["scope.record"] );
+          console.log(res.authSetting["scope.record"]);
           if (res.authSetting["scope.record"] === undefined) {
             resolve(false);
-            return
+            return;
           }
           if (!res.authSetting["scope.record"]) {
             // //调取小程序新版授权页面
