@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 18:04:23
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-03 14:29:25
+ * @LastEditTime: 2020-06-03 15:15:39
  -->
 <!--  -->
 <template>
@@ -24,7 +24,7 @@
       <image
         :src="isRecord?'../static/images/video1.png':'../static/images/video.png'"
         style="width:100%;height:100%;"
-         v-if="!showLoading"
+        v-if="!showLoading"
       />
     </view>
   </view>
@@ -44,7 +44,7 @@ export default class Rocode extends Vue {
     default: false
   })
   private isRecord!: boolean;
-   @Prop({
+  @Prop({
     default: false
   })
   private showLoading!: boolean;
@@ -79,62 +79,67 @@ export default class Rocode extends Vue {
     return new Promise(resolve => {
       uni.getSetting({
         success(res) {
+          console.log(res.authSetting["scope.record"] );
+          if (res.authSetting["scope.record"] === undefined) {
+            resolve(false);
+            return
+          }
           if (!res.authSetting["scope.record"]) {
-            //调取小程序新版授权页面
-            uni.authorize({
-              scope: "scope.record",
-              success() {
-                console.log("录音授权成功");
-                resolve(false);
-                // 用户已经同意小程序使用录音功能
-              },
-              fail() {
-                console.log("第一次录音授权失败");
-                uni.showModal({
-                  title: "提示",
-                  content: "您未授权录音，功能将无法使用",
-                  showCancel: true,
-                  confirmText: "授权",
-                  confirmColor: "#52a2d8",
-                  success: function(res: any) {
-                    if (res.confirm) {
-                      //确认则打开设置页面（重点）
+            // //调取小程序新版授权页面
+            // uni.authorize({
+            //   scope: "scope.record",
+            //   success() {
+            //     console.log("录音授权成功");
+            //     resolve(false);
+            //     // 用户已经同意小程序使用录音功能
+            //   },
+            //   fail() {
+            //     console.log("第一次录音授权失败");
+            uni.showModal({
+              title: "提示",
+              content: "您未授权录音，功能将无法使用",
+              showCancel: true,
+              confirmText: "授权",
+              confirmColor: "#52a2d8",
+              success: function(res: any) {
+                if (res.confirm) {
+                  //确认则打开设置页面（重点）
 
-                      uni.openSetting({
-                        success: uni => {
-                          console.log(res.authSetting);
-                          if (!res.authSetting["scope.record"]) {
-                            console.log("未设置录音授权");
-                            uni.showModal({
-                              title: "提示",
-                              content: "您未授权录音，功能将无法使用",
-                              showCancel: false
-                            });
-                          } else {
-                            //第二次才成功授权
-                            console.log("设置录音授权成功");
-                            resolve(false);
-                          }
-                        },
+                  uni.openSetting({
+                    success: uni => {
+                      console.log(res.authSetting);
+                      if (!res.authSetting["scope.record"]) {
+                        console.log("未设置录音授权");
+                        uni.showModal({
+                          title: "提示",
+                          content: "您未授权录音，功能将无法使用",
+                          showCancel: false
+                        });
+                      } else {
+                        //第二次才成功授权
+                        console.log("设置录音授权成功");
+                        resolve(false);
+                      }
+                    },
 
-                        fail: function() {
-                          resolve(false);
-                          console.log("授权设置录音失败");
-                        }
-                      });
-                    } else if (res.cancel) {
+                    fail: function() {
                       resolve(false);
-                      console.log("cancel");
+                      console.log("授权设置录音失败");
                     }
-                  },
+                  });
+                } else if (res.cancel) {
+                  resolve(false);
+                  console.log("cancel");
+                }
+              },
 
-                  fail: function() {
-                    console.log("openfail");
-                    resolve(false);
-                  }
-                });
+              fail: function() {
+                console.log("openfail");
+                resolve(false);
               }
             });
+            // }
+            // });
           } else {
             resolve(true);
           }
@@ -250,7 +255,7 @@ export default class Rocode extends Vue {
   align-items: center;
   justify-content: center;
   max-width: 100%;
-  border:2upx solid #fff;
+  border: 2upx solid #fff;
   border-radius: 100%;
   margin: 10upx;
   box-sizing: border-box;
@@ -265,7 +270,6 @@ export default class Rocode extends Vue {
   animation-delay: 0.4s;
   width: 0.25em;
   height: 1em;
- 
 }
 .loader-15:after,
 .loader-15:before {
