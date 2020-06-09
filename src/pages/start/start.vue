@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 11:04:54
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-02 15:56:35
+ * @LastEditTime: 2020-06-09 11:27:49
  -->
 <!--  -->
 <template>
@@ -21,12 +21,29 @@ import { setAuth } from "../../utils/util";
 export default class extends Vue {
   async onLoad(data: any) {
     let url = "";
+    if (data.q) {
+      let qrUrl = decodeURIComponent(data.q);
+      var tempId = this.getQueryString(qrUrl, "url") || "";
+      url = decodeURIComponent(tempId);
+    }
     if (data && data.url) {
       url = decodeURIComponent(data.url);
     }
     this.login(url);
   }
-  login(url:string) {
+  /**
+   * 获取小程序二维码参数
+   * @param {String} scene 需要转换的参数字符串
+   */
+  getQueryString(url: string, name: string) {
+    var reg = new RegExp("(^|&|/?)" + name + "=([^&|/?]*)(&|/?|$)", "i");
+    var r = url.substr(1).match(reg);
+    if (r != null) {
+      return r[2];
+    }
+    return null;
+  }
+  login(url: string) {
     uni.login({
       success: async res => {
         let { access_token } = await post(
@@ -44,7 +61,7 @@ export default class extends Vue {
         });
       },
       fail: () => {
-        this.login(url)
+        this.login(url);
       }
     });
   }
