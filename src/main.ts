@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-04-13 13:28:51
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-03 14:46:00
+ * @LastEditTime: 2020-06-09 09:51:27
  */
 
 import Vue from 'vue';
@@ -23,7 +23,8 @@ const app = new Vue({
 		globalData: {},
 		onLaunch() {
 			let info = uni.getSystemInfoSync();
-			if ((info.model || '').indexOf('iPhone XS Max') != -1) {
+			let model = info.model || '';
+			if (model.search('iPhone X') != -1 || model.search('iPhone 11') != -1) {
 				this.$store.dispatch('setStatusBarAction', 44);
 				this.$store.dispatch('setCustomBarAction', 84);
 			} else {

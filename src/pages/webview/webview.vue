@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 23:40:09
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-02 20:14:07
+ * @LastEditTime: 2020-06-09 10:21:14
  -->
 <!--  -->
 <template>
@@ -23,6 +23,7 @@ import cuCustom from "@/assets/colorui/components/cu-custom.vue";
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { post, get } from "../../plugins/request";
 import { State } from "vuex-class";
+import { getAuth } from '../../utils/util';
 @Component({ components: { cuCustom }, name: "WebView" })
 export default class WebView extends Vue {
   @State CustomBar!: number;
@@ -47,7 +48,7 @@ export default class WebView extends Vue {
     }
     uni.login({
       success: res => {
-        this.myUrl = `${this.url}&jsCode=${res.code}&userName=${this.userName}&from=${this.from}`;
+        this.myUrl = `${this.url}&jsCode=${res.code}&userName=${this.userName}&from=${this.from}&portalToken=${getAuth()}`;
       }
     });
     if (this.viewAppId)
@@ -59,7 +60,6 @@ export default class WebView extends Vue {
     let url =
       urlList[0] +
       (urlList.length > 1 ? "?" + urlList[1].split("&jsCode")[0] : "");
-    console.log("-----", url);
     let jumpParams = {
       title: getApp().globalData!!.title,
       viewAppId: getApp().globalData!!.viewAppId,
