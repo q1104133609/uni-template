@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-16 15:35:33
+ * @LastEditTime: 2020-06-16 15:45:50
  -->
 <!--  -->
 <template>
@@ -105,7 +105,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 //@ts-ignore
 import CryptoJS from "../../../node_modules/crypto-js/crypto-js.js";
 import { getAuth, sendMatomo, senJumpMatomo } from "../../utils/util";
-import { get } from "../../plugins/request";
+import { get, post } from "../../plugins/request";
 import { State } from "vuex-class";
 //@ts-ignore
 const base64 = require("@/utils/base64.js");
@@ -162,6 +162,10 @@ export default class Index extends Vue {
           getApp().globalData!.url = res.rows[0].appUrl;
           getApp().globalData!.title = res.rows[0].appName;
           getApp().globalData!.viewAppId = res.rows[0].id;
+          post("/api/wechat/view/history/insert", {
+            viewAppId: res.rows[0].id,
+            voiceHistoryContent: this.searchWodr
+          });
           uni.navigateTo({
             url: "/pages/webview/webview",
             success: () => {
@@ -296,7 +300,7 @@ export default class Index extends Vue {
     });
   }
   onBack() {
-    senJumpMatomo("从结果页返回到主页",'/pages/index/index');
+    senJumpMatomo("从结果页返回到主页", "/pages/index/index");
   }
 
   //录音结束
