@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-12 22:45:32
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-26 14:56:23
+ * @LastEditTime: 2020-06-16 15:29:43
  -->
 <!--  -->
 <template>
@@ -19,7 +19,8 @@
 
 <script lang='ts'>
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { mapState } from 'vuex';
+import { mapState } from "vuex";
+import { post } from "../plugins/request";
 @Component({ components: {}, name: "Block" })
 export default class extends Vue {
   @Prop({ default: "" })
@@ -30,12 +31,18 @@ export default class extends Vue {
   private content!: string;
   @Prop({ default: "" })
   private url!: string;
+  @Prop({ default: "" })
+  private voiceHistoryContent!: string;
   toWebView() {
     if (this.url) {
       getApp().globalData!.url = this.url;
       getApp().globalData!.title = this.title;
       getApp().globalData!.viewAppId = this.viewAppId;
-      console.log( getApp().globalData!.viewAppId)
+      post("/api/wechat/view/history/insert", {
+        viewAppId: this.viewAppId,
+        voiceHistoryContent: this.voiceHistoryContent
+      });
+   
       uni.navigateTo({
         url: "/pages/webview/webview"
       });

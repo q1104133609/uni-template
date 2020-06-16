@@ -4,14 +4,14 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-02 15:56:10
+ * @LastEditTime: 2020-06-16 15:35:33
  -->
 <!--  -->
 <template>
   <mycontent
     title="数字旭辉"
     :isback="searchWodr"
-    @back="isfocus=false;searchWodr='';isRecord = false;items = []"
+    @back="isfocus=false;searchWodr='';isRecord = false;items = [];onBack()"
   >
     <scroll-view scroll-y :style="{'height':`calc(100vh - ${this.CustomBar||84}px - 280rpx)`}">
       <view v-if="searchWodr">
@@ -48,6 +48,7 @@
           :content="item.appDescription"
           :url="item.appUrl"
           :viewAppId="item.id"
+          :voiceHistoryContent="searchWodr"
         />
         <view v-if="items.length<=0&&!isRecord&&!isWaitBack">
           <view
@@ -103,7 +104,7 @@ import Recode from "@/components/recode.vue";
 import { Component, Prop, Vue } from "vue-property-decorator";
 //@ts-ignore
 import CryptoJS from "../../../node_modules/crypto-js/crypto-js.js";
-import { getAuth } from "../../utils/util";
+import { getAuth, sendMatomo, senJumpMatomo } from "../../utils/util";
 import { get } from "../../plugins/request";
 import { State } from "vuex-class";
 //@ts-ignore
@@ -139,7 +140,6 @@ export default class Index extends Vue {
   isEnd = false;
   iatResult: any[] = [];
   async onShow() {
-    console.log("onShow");
     if (this.xfInfo.apiSecret) return;
     get("/api/public/wechat/tip/content/config/queryCommonTips").then(v => {
       this.queryCommonTips = v.rows;
@@ -153,11 +153,10 @@ export default class Index extends Vue {
   //搜索数据
   async getData() {
     if (this.searchWodr) {
-      console.log(`请求参数:${this.searchWodr}`);
+      sendMatomo(`搜索${this.searchWodr}`);
       const res = await get("/api/wechat/app/search/index/query", {
         searchParam: this.searchWodr
       });
-      console.log(`返回值:${res}`);
       if (res.success) {
         if (res.rows.length === 1) {
           getApp().globalData!.url = res.rows[0].appUrl;
@@ -296,6 +295,9 @@ export default class Index extends Vue {
       }
     });
   }
+  onBack() {
+    senJumpMatomo("从结果页返回到主页",'/pages/index/index');
+  }
 
   //录音结束
   onRecordOver(isNoamlOver: boolean) {
@@ -327,12 +329,8 @@ export default class Index extends Vue {
       try {
         this.isSocket && uni.closeSocket();
       } catch (error) {}
-
-      console.log("被动倒计时结束");
     } else {
-      console.log("开始倒计时");
       this.isWait = setTimeout(() => {
-        console.log("主动倒计时结束");
         clearTimeout(this.isWait);
         this.isWait = null;
         try {
@@ -346,6 +344,7 @@ export default class Index extends Vue {
     if (this.isRecord || this.isAnimotion || this.isEnd || this.isWait) {
       return;
     }
+
     uni.vibrateLong({
       success: () => {
         console.log("手指按下震动成功");
@@ -424,6 +423,7 @@ export default class Index extends Vue {
   }
   //历史跳转
   toHistory() {
+    senJumpMatomo("跳转查看记录", "/pages/history/history");
     uni.navigateTo({
       url: "/pages/history/history"
     });

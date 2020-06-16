@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-04-13 13:28:51
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-09 09:51:27
+ * @LastEditTime: 2020-06-12 15:29:52
  */
 
 import Vue from 'vue';
@@ -14,6 +14,7 @@ import store from './store';
 //把vuex定义成全局组件
 Vue.prototype.$store = store;
 Vue.config.productionTip = false;
+
 import '@/assets/colorui/main.css';
 import '@/assets/colorui/icon.css';
 const app = new Vue({

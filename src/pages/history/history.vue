@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-12 22:52:46
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-01 19:03:52
+ * @LastEditTime: 2020-06-13 10:27:20
  -->
 <!--  -->
 <template>
@@ -31,6 +31,7 @@ import mycontent from "@/components/mycontent.vue";
 import myBlock from "@/components/block.vue";
 import { get } from "../../plugins/request";
 import { State } from "vuex-class";
+import { sendMatomo, senJumpMatomo } from "../../utils/util";
 @Component({ components: { mycontent, myBlock }, name: "History" })
 export default class extends Vue {
   @State CustomBar!: number;
@@ -45,7 +46,9 @@ export default class extends Vue {
       this.items = res.rows;
     }
   }
-  mounted() {}
+  onUnload() {
+    senJumpMatomo("从历史页返回到主页","/pages/index/index");
+  }
   onShareAppMessage(res: any) {
     return {
       title: "邀请您查看数字旭辉",

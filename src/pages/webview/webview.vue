@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 23:40:09
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-09 10:21:14
+ * @LastEditTime: 2020-06-13 10:27:33
  -->
 <!--  -->
 <template>
@@ -23,9 +23,9 @@ import cuCustom from "@/assets/colorui/components/cu-custom.vue";
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { post, get } from "../../plugins/request";
 import { State } from "vuex-class";
-import { getAuth } from '../../utils/util';
+import { getAuth, sendMatomo, senJumpMatomo } from "../../utils/util";
 @Component({ components: { cuCustom }, name: "WebView" })
-export default class WebView extends Vue {
+export default class extends Vue {
   @State CustomBar!: number;
   @State StatusBar!: number;
   url = getApp().globalData!!.url;
@@ -46,15 +46,18 @@ export default class WebView extends Vue {
       this.userName = res.employeeInfo.userName;
       this.from = "share";
     }
+    sendMatomo( "访问" + this.title, this.url);
     uni.login({
       success: res => {
-        this.myUrl = `${this.url}&jsCode=${res.code}&userName=${this.userName}&from=${this.from}&portalToken=${getAuth()}`;
+        this.myUrl = `${this.url}&jsCode=${res.code}&userName=${
+          this.userName
+        }&from=${this.from}&portalToken=${getAuth()}`;
       }
     });
-    if (this.viewAppId)
-      post("/api/wechat/view/history/insert", { viewAppId: this.viewAppId });
   }
-
+  onUnload() {
+     senJumpMatomo("从WebView返回到主页","/pages/index/index");
+  }
   onShareAppMessage(res: any) {
     let urlList = res.webViewUrl.split("?");
     let url =
@@ -66,9 +69,13 @@ export default class WebView extends Vue {
       url
     };
 
-    uni.showToast({
-      title: url
-    });
+    // uni.showToast({
+    //   title: url
+    // });
+    sendMatomo(
+      "分享" + getApp().globalData!!.title,
+      url
+    );
     return {
       title: `邀请您查看${this.title}`,
       imageUrl: "../../static/images/share.png",
