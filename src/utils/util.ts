@@ -1,3 +1,4 @@
+import { matomuhost } from './../commont/constant';
 import { get } from './../plugins/request';
 /*
  * @Descripttion: 
@@ -5,7 +6,7 @@ import { get } from './../plugins/request';
  * @Author: 小白
  * @Date: 2020-03-22 09:45:47
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-16 15:29:07
+ * @LastEditTime: 2020-06-16 15:50:54
  */
 import { BaseRequest } from '@/plugins/request';
 export const setAuth = (auth: string) => {
@@ -39,7 +40,7 @@ export const getWxCode = () => {
 
 export const sendMatomo = (e_n?: string, e_v?: string) => {
 	let uid = getApp().globalData!!.userName
-	let requestUrl = `https://statistics-dev.cifi.com.cn/matomo/piwik.php?e_c=${e_n ? 'trackEvent' : ''}&e_a=${e_n
+	let requestUrl = `${matomuhost}/matomo/piwik.php?e_c=${e_n ? 'trackEvent' : ''}&e_a=${e_n
 		? 'appClick'
 		: ''}&e_n=${e_n}&idsite=66&e_v=${e_v}&rec=1&uid=${uid}`;
 	uni.request({
@@ -51,8 +52,7 @@ export const sendMatomo = (e_n?: string, e_v?: string) => {
 
 export const senJumpMatomo = (action_name: string, url?: string) => {
 	let uid = getApp().globalData!!.userName
-	
-	let requestUrl = `https://statistics-dev.cifi.com.cn/matomo/piwik.php?idsite=66&rec=1&uid=${uid}&url=https:/${url}&action_name=${action_name}`;
+	let requestUrl = `${matomuhost}/matomo/piwik.php?idsite=66&rec=1&uid=${uid}&url=https:/${url}&action_name=${action_name}`;
 	uni.request({
 		url: requestUrl,
 		method: 'GET'

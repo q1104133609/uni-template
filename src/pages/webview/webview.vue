@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 23:40:09
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-13 10:27:33
+ * @LastEditTime: 2020-06-20 10:35:52
  -->
 <!--  -->
 <template>
@@ -46,6 +46,7 @@ export default class extends Vue {
       this.userName = res.employeeInfo.userName;
       this.from = "share";
     }
+    console.log(this.title)
     sendMatomo( "访问" + this.title, this.url);
     uni.login({
       success: res => {
@@ -64,8 +65,8 @@ export default class extends Vue {
       urlList[0] +
       (urlList.length > 1 ? "?" + urlList[1].split("&jsCode")[0] : "");
     let jumpParams = {
-      title: getApp().globalData!!.title,
-      viewAppId: getApp().globalData!!.viewAppId,
+      title: this.title,
+      viewAppId: this.viewAppId,
       url
     };
 
