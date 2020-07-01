@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-12 22:52:46
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-13 10:27:20
+ * @LastEditTime: 2020-07-01 14:45:46
  -->
 <!--  -->
 <template>
@@ -16,6 +16,8 @@
         :title="item.viewAppName"
         :content="item.appDescription"
         :url="item.viewappUrl"
+        :viewAppId="item.viewAppId"
+        :voiceContentId="-1"
       />
     </scroll-view>
     <view

@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-11 22:47:38
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-16 15:45:50
+ * @LastEditTime: 2020-07-01 09:57:44
  -->
 <!--  -->
 <template>
@@ -49,6 +49,7 @@
           :url="item.appUrl"
           :viewAppId="item.id"
           :voiceHistoryContent="searchWodr"
+          :voiceContentId="voiceContentId"
         />
         <view v-if="items.length<=0&&!isRecord&&!isWaitBack">
           <view
@@ -114,6 +115,7 @@ export default class Index extends Vue {
   @State CustomBar!: number;
   recorderManager = uni.getRecorderManager();
   items: any[] = [];
+  voiceContentId = ""; //搜索结果id
   isLastFrame = false; //是否最后一帧
   firstSend = true; //是否第一次
   isfocus = false; //是否有焦点
@@ -164,7 +166,7 @@ export default class Index extends Vue {
           getApp().globalData!.viewAppId = res.rows[0].id;
           post("/api/wechat/view/history/insert", {
             viewAppId: res.rows[0].id,
-            voiceHistoryContent: this.searchWodr
+            voiceContentId: res.voiceContentId
           });
           uni.navigateTo({
             url: "/pages/webview/webview",
@@ -177,6 +179,7 @@ export default class Index extends Vue {
             }
           });
         } else {
+          this.voiceContentId = res.voiceContentId;
           this.items = res.rows;
           this.isWaitBack = false;
         }

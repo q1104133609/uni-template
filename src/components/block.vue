@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-12 22:45:32
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-16 15:29:43
+ * @LastEditTime: 2020-07-01 09:54:16
  -->
 <!--  -->
 <template>
@@ -33,6 +33,8 @@ export default class extends Vue {
   private url!: string;
   @Prop({ default: "" })
   private voiceHistoryContent!: string;
+  @Prop({ default: "" })
+  private voiceContentId!: string;
   toWebView() {
     if (this.url) {
       getApp().globalData!.url = this.url;
@@ -40,7 +42,7 @@ export default class extends Vue {
       getApp().globalData!.viewAppId = this.viewAppId;
       post("/api/wechat/view/history/insert", {
         viewAppId: this.viewAppId,
-        voiceHistoryContent: this.voiceHistoryContent
+        voiceContentId:this.voiceContentId
       });
    
       uni.navigateTo({

@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 23:40:09
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-20 10:35:52
+ * @LastEditTime: 2020-07-01 09:57:26
  -->
 <!--  -->
 <template>
@@ -45,9 +45,13 @@ export default class extends Vue {
       this.title = params.title;
       this.userName = res.employeeInfo.userName;
       this.from = "share";
+      post("/api/wechat/view/history/insert", {
+        viewAppId: params.viewAppId,
+        voiceContentId: -2,
+      });
     }
-    console.log(this.title)
-    sendMatomo( "访问" + this.title, this.url);
+
+    sendMatomo("访问" + this.title, this.url);
     uni.login({
       success: res => {
         this.myUrl = `${this.url}&jsCode=${res.code}&userName=${
@@ -57,7 +61,7 @@ export default class extends Vue {
     });
   }
   onUnload() {
-     senJumpMatomo("从WebView返回到主页","/pages/index/index");
+    senJumpMatomo("从WebView返回到主页", "/pages/index/index");
   }
   onShareAppMessage(res: any) {
     let urlList = res.webViewUrl.split("?");
@@ -73,10 +77,7 @@ export default class extends Vue {
     // uni.showToast({
     //   title: url
     // });
-    sendMatomo(
-      "分享" + getApp().globalData!!.title,
-      url
-    );
+    sendMatomo("分享" + getApp().globalData!!.title, url);
     return {
       title: `邀请您查看${this.title}`,
       imageUrl: "../../static/images/share.png",
