@@ -4,18 +4,12 @@
  * @Author: 小白
  * @Date: 2020-05-13 23:40:09
  * @LastEditors: 小白
- * @LastEditTime: 2020-07-01 09:57:26
+ * @LastEditTime: 2020-07-03 09:40:46
  -->
 <!--  -->
 <template>
-  <div style="width:100vw;background:#21212B;min-height:100vh">
-    <cu-custom :isback="true" bgcolor="#272733">
-      <block slot="content">{{title}}</block>
-    </cu-custom>
-    <web-view :src="myUrl" :webview-styles="webviewStyles">
-      <!-- <cover-image src="../../static/images/voiceright.png" class="myImages"/> -->
-    </web-view>
-  </div>
+  <web-view :src="myUrl" :webview-styles="webviewStyles">
+  </web-view>
 </template>
 
 <script lang='ts'>
@@ -26,8 +20,6 @@ import { State } from "vuex-class";
 import { getAuth, sendMatomo, senJumpMatomo } from "../../utils/util";
 @Component({ components: { cuCustom }, name: "WebView" })
 export default class extends Vue {
-  @State CustomBar!: number;
-  @State StatusBar!: number;
   url = getApp().globalData!!.url;
   viewAppId = getApp().globalData!!.viewAppId;
   title = getApp().globalData!!.title;
@@ -47,7 +39,7 @@ export default class extends Vue {
       this.from = "share";
       post("/api/wechat/view/history/insert", {
         viewAppId: params.viewAppId,
-        voiceContentId: -2,
+        voiceContentId: -2
       });
     }
 

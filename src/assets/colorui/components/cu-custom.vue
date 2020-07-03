@@ -3,7 +3,7 @@
  * @Author: 小白
  * @Date: 2019-09-17 02:03:28
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-02 08:45:22
+ * @LastEditTime: 2020-07-03 09:58:32
  -->
 <template>
   <view>
@@ -31,8 +31,6 @@ import { Action, State } from "vuex-class";
   name: "cu-custom"
 })
 export default class CuCustom extends Vue {
-  @State CustomBar!: number;
-  @State StatusBar!: number;
   @Prop({
     type: [Boolean, String],
     default: false
@@ -43,9 +41,18 @@ export default class CuCustom extends Vue {
     default: "transparent"
   })
   private bgColor!: string;
+  CustomBar = 84;
+  statusBarHeight = 20;
+  created() {
+    let info = uni.getSystemInfoSync();
+    let custom = uni.getMenuButtonBoundingClientRect();
+    this.statusBarHeight = info.statusBarHeight || 20;
+    this.CustomBar = info.statusBarHeight
+      ? custom.bottom!! + custom.top!! - info.statusBarHeight!!
+      : 84;
+  }
   get style() {
-    var style = `height:${this.CustomBar || 84}px;padding-top:${this
-      .StatusBar || 44}px;`;
+    var style = `height:${this.CustomBar}px;padding-top:${this.statusBarHeight}px;`;
     if (this.bgColor) {
       style = `${style}background:${this.bgColor}`;
     }

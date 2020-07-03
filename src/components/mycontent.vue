@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-04-13 13:28:51
  * @LastEditors: 小白
- * @LastEditTime: 2020-05-26 15:30:45
+ * @LastEditTime: 2020-07-03 09:49:04
  -->
 <template>
   <view style="width:100vw">
@@ -12,9 +12,7 @@
       <block slot="content">{{title}}</block>
     </cu-custom>
     <view
-      :style="{'padding-top':`${cuCustom}px`}"
-      style="width:100vw;padding-left:48upx;padding-right:48upx"
-    >
+      style="width:100vw;padding-left:48upx;padding-right:48upx">
       <slot></slot>
     </view>
   </view>
@@ -28,7 +26,6 @@ import { State } from "vuex-class";
   components: { cuCustom }
 })
 export default class extends Vue {
-  @State CustomBar!: number;
   @Prop()
   private title!: string;
   @Prop({
