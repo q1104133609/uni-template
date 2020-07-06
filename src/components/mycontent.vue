@@ -4,15 +4,14 @@
  * @Author: 小白
  * @Date: 2020-04-13 13:28:51
  * @LastEditors: 小白
- * @LastEditTime: 2020-07-03 09:49:04
+ * @LastEditTime: 2020-07-06 22:44:52
  -->
 <template>
   <view style="width:100vw">
-    <cu-custom :isback="isback" @back="$emit('back')">
+    <cu-custom :isback="isback" @back="$emit('back')" v-if="!isHiddeHead">
       <block slot="content">{{title}}</block>
     </cu-custom>
-    <view
-      style="width:100vw;padding-left:48upx;padding-right:48upx">
+    <view style="width:100vw;padding-left:48upx;padding-right:48upx">
       <slot></slot>
     </view>
   </view>
@@ -28,6 +27,11 @@ import { State } from "vuex-class";
 export default class extends Vue {
   @Prop()
   private title!: string;
+  @Prop({
+    type: Boolean,
+    default: false
+  })
+  private isHiddeHead!: boolean;
   @Prop({
     type: [Boolean, String],
     default: false

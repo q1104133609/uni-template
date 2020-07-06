@@ -4,13 +4,10 @@
  * @Author: 小白
  * @Date: 2020-07-06 19:27:47
  * @LastEditors: 小白
- * @LastEditTime: 2020-07-06 22:51:55
+ * @LastEditTime: 2020-07-06 22:12:46
 --> 
 <template>
-  <mycontent title="数字旭辉">
-      <cell bind:startmessage='startmessage' bind:completemessage="completemessage" plugid='ea8fa16642f5cefb883c9efd754a2d8e'  />
-  </mycontent>
-  
+  <mycontent title="订单"></mycontent>
 </template>
 
 <script lang='ts'>
