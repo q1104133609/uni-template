@@ -4,7 +4,7 @@
  * @Author: 小白
  * @Date: 2020-05-13 11:04:54
  * @LastEditors: 小白
- * @LastEditTime: 2020-06-09 11:27:49
+ * @LastEditTime: 2020-07-06 19:28:49
  -->
 <!--  -->
 <template>
@@ -14,10 +14,9 @@
 <script lang='ts'>
 import { Component, Prop, Vue } from "vue-property-decorator";
 import mycontent from "@/components/mycontent.vue";
-import myBlock from "@/components/block.vue";
 import { post } from "../../plugins/request";
 import { setAuth } from "../../utils/util";
-@Component({ components: { mycontent, myBlock }, name: "Logn" })
+@Component({ components: { mycontent }, name: "Logn" })
 export default class extends Vue {
   async onLoad(data: any) {
     let url = "";
@@ -49,13 +48,6 @@ export default class extends Vue {
         let { access_token } = await post(
           `/oauth/token?client_id=client2&client_secret=secret&grant_type=password&username=${res.code}`
         );
-        if (!access_token) {
-          uni.reLaunch({
-            url: "/pages/welcome/welcome"
-          });
-          return;
-        }
-        setAuth(access_token || "");
         uni.reLaunch({
           url: url || "/pages/index/index"
         });
@@ -67,7 +59,6 @@ export default class extends Vue {
   }
   onShareAppMessage(res: any) {
     return {
-      title: "邀请您查看数字旭辉",
       path: `/pages/start/start`
     };
   }

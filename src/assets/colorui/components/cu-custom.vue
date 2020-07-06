@@ -3,7 +3,7 @@
  * @Author: 小白
  * @Date: 2019-09-17 02:03:28
  * @LastEditors: 小白
- * @LastEditTime: 2020-07-03 10:00:56
+ * @LastEditTime: 2020-07-06 19:31:38
  -->
 <template>
   <view>
@@ -38,7 +38,7 @@ export default class CuCustom extends Vue {
   private isback!: [Boolean, String];
   @Prop({
     type: String,
-    default: "transparent"
+    default: "blue"
   })
   private bgColor!: string;
   CustomBar = 84;

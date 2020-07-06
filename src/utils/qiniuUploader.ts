@@ -144,16 +144,16 @@ function doUpload({
         fail && fail(e);
       }
     },
-    fail: function (error) {
+    fail: function (error:any) {
       console.error(error);
       fail && fail(error);
     },
-    complete: function (err) {
+    complete: function (err:any) {
       complete && complete();
     }
   });
 
-  uploadTask.onProgressUpdate(res => {
+  uploadTask.onProgressUpdate((res:any) => {
     progress && progress(res);
   });
 
@@ -176,7 +176,7 @@ function getQiniuToken(callback: () => void) {
         );
       }
     },
-    fail: function (error) {
+    fail: function (error:any) {
       console.error(
         'qiniu UploadToken is null, please check the init config or networking: ' +
         error

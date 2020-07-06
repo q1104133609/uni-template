@@ -4,22 +4,7 @@
 			"path": "pages/start/start"
 		},
 		{
-			"path": "pages/register/register"
-		},
-		{
-			"path": "pages/welcome/welcome"
-		},
-		{
 			"path": "pages/index/index"
-		},
-		{
-			"path": "pages/history/history"
-		},
-		{
-			"path": "pages/login/login"
-		},
-		{
-			"path": "pages/webview/webview"
 		}
 	],
 	"globalStyle": {
